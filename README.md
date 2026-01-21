@@ -1,5 +1,9 @@
 # Beesist
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![PHP Version](https://img.shields.io/badge/php-%5E8.2-blue)
+![Laravel](https://img.shields.io/badge/laravel-%5E11.0-red)
+
 **Beesist** is a comprehensive, modular property management system built on Laravel. It leverages a Modular Monolith architecture to handle complex workflows for landlords, property managers, agents, and tenants.
 
 ## 🏗 Architecture
@@ -35,7 +39,6 @@ The system uses [spatie/laravel-permission](https://spatie.be/docs/laravel-permi
 - **Payments**: `laravel/cashier` (Stripe)
 - **Permissions**: `spatie/laravel-permission`
 - **PDF**: `barryvdh/laravel-dompdf`
-- **Activity Log**: `spatie/laravel-activitylog`
 
 **Frontend**
 
@@ -49,17 +52,32 @@ The system uses [spatie/laravel-permission](https://spatie.be/docs/laravel-permi
 1.  **Clone & Install**
 
     ```bash
-    git clone <repo-url>
+    git clone https://github.com/ermradulsharma/beesist.git
     cd beesist
     composer install
     npm install
     ```
 
 2.  **Environment Setup**
+    Copy the example env file and generate the key:
 
     ```bash
     cp .env.example .env
     php artisan key:generate
+    ```
+
+    **Required Environment Variables**:
+    Update your `.env` file with the following credentials (required for payments and SMS):
+
+    ```ini
+    # Stripe (Cashier)
+    STRIPE_KEY=pk_test_...
+    STRIPE_SECRET=sk_test_...
+
+    # Twilio (SMS)
+    TWILIO_SID=AC...
+    TWILIO_TOKEN=...
+    TWILIO_FROM=+1...
     ```
 
 3.  **Database**
@@ -92,8 +110,18 @@ php artisan module:make-model <ModelName> -mcr <ModuleName>
 php artisan module:make-livewire <ComponentName> <ModuleName>
 ```
 
-**Troubleshooting Livewire in Modules**
-If `MakeCommand` is not found, ensure `Livewire\Commands\MakeCommand` is imported in `vendor\mhmiton\laravel-modules-livewire\src\Traits\CommandHelper.php`.
+### Troubleshooting
+
+**Livewire in Modules (MakeCommand)**
+If you encounter `Target class [Livewire\Features\SupportConsoleCommands\Commands\MakeCommand] does not exist` or similar:
+
+- Ensure your `composer.json` has `"barryvdh/laravel-ide-helper": "^3.0"`.
+- Run `composer update barryvdh/laravel-ide-helper`.
+
+**BindingResolutionException**
+If you see errors related to `Nwidart\Modules\Commands\Make\CommandMakeCommand`:
+
+- Ensure `config/modules.php` is updated to match `nwidart/laravel-modules` v10 namespace structure (flattened command namespaces).
 
 ### Default Credentials (Seeded)
 
