@@ -21,7 +21,9 @@ class UserEntityFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'account_id' => \App\Domains\Auth\Models\User::factory(),
+            'entity_key' => 'property',
+            'entity_value' => \Modules\Property\Entities\Property::factory(),
         ];
     }
 }

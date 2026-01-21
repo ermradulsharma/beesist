@@ -21,7 +21,17 @@ class RentalApplicationFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'user_id' => \App\Domains\Auth\Models\User::factory(),
+            'prop_id' => \Modules\Property\Entities\Property::factory(),
+            'first_name' => $this->faker->firstName(),
+            'last_name' => $this->faker->lastName(),
+            'email' => $this->faker->unique()->safeEmail(),
+            'phone' => $this->faker->phoneNumber(),
+            'street_address' => $this->faker->streetAddress(),
+            'city' => $this->faker->city(),
+            'state' => $this->faker->state(),
+            'zip_code' => $this->faker->postcode(),
+            'status' => 'Pending',
         ];
     }
 }
