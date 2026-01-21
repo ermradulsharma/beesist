@@ -2,13 +2,13 @@
 
 namespace Modules\Tenant\Http\Livewire;
 
-use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Illuminate\Database\Eloquent\Builder;
-use Rappasoft\LaravelLivewireTables\Views\Column;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Log;
-use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 use Modules\Tenant\Entities\TenancyEndNotice;
+use Rappasoft\LaravelLivewireTables\DataTableComponent;
+use Rappasoft\LaravelLivewireTables\Views\Column;
+use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 
 class TenancyEndNoticeTable extends DataTableComponent
 {

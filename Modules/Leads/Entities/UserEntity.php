@@ -4,8 +4,8 @@ namespace Modules\Leads\Entities;
 
 use App\Domains\Auth\Models\User;
 use App\Models\Setting;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Property\Entities\Building;
 use Modules\Property\Entities\Property;
 
@@ -14,7 +14,7 @@ class UserEntity extends Model
     use HasFactory;
 
     protected $fillable = [
-        'account_id', 'entity_key', 'entity_value'
+        'account_id', 'entity_key', 'entity_value',
     ];
 
     public function buildings()
@@ -31,8 +31,6 @@ class UserEntity extends Model
     {
         return $this->belongsTo(Property::class, 'entity_value')->with('propertyImages', 'strataDocs', 'featured_image', 'userEntity')->whereRaw("find_in_set('For Rent', prop_status)")->where('status', '1')->select('id', 'title', 'address', 'city');
     }
-
-
 
     protected static function newFactory()
     {

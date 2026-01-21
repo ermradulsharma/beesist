@@ -3,15 +3,16 @@
 namespace Modules\RentalApplication\Entities;
 
 use App\Domains\Auth\Models\User;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Modules\Leads\Entities\UserEntity;
 use Modules\Property\Entities\Property;
 
 class RentalApplication extends Model
 {
-    use HasFactory, Notifiable;
+    use HasFactory;
+    use Notifiable;
 
     protected $fillable = [
         'id',
@@ -54,7 +55,7 @@ class RentalApplication extends Model
     ];
 
     protected $appends = [
-        'name'
+        'name',
     ];
 
     protected static function newFactory()
@@ -74,7 +75,8 @@ class RentalApplication extends Model
 
     public function property()
     {
-        return $this->belongsTo(Property::class, 'prop_id')->select('id', 'user_id', 'title', 'address', 'country', 'state', 'city', 'zip', 'rate', 'unit_number', 'prop_type', 'strata_property_details', 'prop_agents')->with(['featuredImage', 'agentDetail']);;
+        return $this->belongsTo(Property::class, 'prop_id')->select('id', 'user_id', 'title', 'address', 'country', 'state', 'city', 'zip', 'rate', 'unit_number', 'prop_type', 'strata_property_details', 'prop_agents')->with(['featuredImage', 'agentDetail']);
+        ;
     }
 
     public function sc_questions()

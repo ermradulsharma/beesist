@@ -6,12 +6,14 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\HtmlString;
-use Modules\Property\Entities\ShowingApplication;
 
 class DefaultNotification extends Notification
 {
     use Queueable;
-    public $greeting, $message, $subject;
+    public $greeting;
+    public $message;
+    public $subject;
+
     /**
      * Create a new notification instance.
      *
@@ -43,7 +45,7 @@ class DefaultNotification extends Notification
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage)->subject($this->subject)->greeting($this->greeting)->line(new HtmlString($this->message));
+        return (new MailMessage())->subject($this->subject)->greeting($this->greeting)->line(new HtmlString($this->message));
     }
 
     /**

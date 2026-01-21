@@ -25,4 +25,3 @@ class TenantFactory extends Factory
         ];
     }
 }
-

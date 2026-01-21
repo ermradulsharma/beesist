@@ -3,15 +3,16 @@
 namespace Modules\Property\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\HtmlString;
 
 class AppointmentNotification extends Notification
 {
     use Queueable;
-    public $name, $subject, $message;
+    public $name;
+    public $subject;
+    public $message;
 
     /**
      * Create a new notification instance.
@@ -36,7 +37,7 @@ class AppointmentNotification extends Notification
      */
     public function toMail($notifiable): MailMessage
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject($this->subject)
             ->greeting('Hello ' . $this->name. ',')
             ->line(new HtmlString($this->message))

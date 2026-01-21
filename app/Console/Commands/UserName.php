@@ -35,6 +35,7 @@ class UserName extends Command
             $user->save();
         }
         $this->info('UUIDs generated for existing users successfully.');
+
         return Command::SUCCESS;
     }
 }

@@ -25,4 +25,3 @@ class PropertyFactory extends Factory
         ];
     }
 }
-

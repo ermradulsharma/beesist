@@ -25,4 +25,3 @@ class ScreeningQuestionFactory extends Factory
         ];
     }
 }
-

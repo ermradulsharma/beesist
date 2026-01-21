@@ -4,9 +4,8 @@ namespace Modules\Leads\Notifications;
 
 use App\Domains\Auth\Models\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\HtmlString;
 
 class ConfirmationEmailNotification extends Notification
@@ -44,7 +43,8 @@ class ConfirmationEmailNotification extends Notification
     public function toMail($notifiable)
     {
         $uuid = User::where('email', $this->data['user_email'])->first()->uuid;
-        return (new MailMessage)
+
+        return (new MailMessage())
             ->subject($this->data['subject'])
             ->greeting('Hello ' . $this->data['user_name']  . ',')
             ->line(new HtmlString($this->data['msg']))

@@ -33,11 +33,11 @@ class UnusedPassword implements Rule
     public function passes($attribute, $value): bool
     {
         // Option is off
-        if (!config('boilerplate.access.user.password_history')) {
+        if (! config('boilerplate.access.user.password_history')) {
             return true;
         }
 
-        if (!$this->user instanceof User) {
+        if (! $this->user instanceof User) {
             if (is_numeric($this->user)) {
                 $this->user = resolve(UserService::class)->getById($this->user);
             } else {
@@ -45,7 +45,7 @@ class UnusedPassword implements Rule
             }
         }
 
-        if (!$this->user || $this->user === null) {
+        if (! $this->user || $this->user === null) {
             return false;
         }
 

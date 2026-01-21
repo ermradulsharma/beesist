@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Modules\Leads\Entities\UserEntity;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
-use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\DateRangeFilter;
+use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
 
 /**
@@ -21,6 +21,7 @@ class UsersTable extends DataTableComponent
     public $model = User::class;
     public $confirming = null;
     public $account_id;
+
     public function mount($account_id = null, $status = 'active'): void
     {
         $this->account_id = $account_id;
@@ -56,8 +57,6 @@ class UsersTable extends DataTableComponent
     /**
      * @param  string  $status
      */
-
-
     public function filters(): array
     {
         $user = Auth::user();
@@ -70,7 +69,7 @@ class UsersTable extends DataTableComponent
                 'Property Owner' => 'Property Owner',
                 'Agent' => 'Agent',
             ])->filter(function (Builder $builder, string $value) {
-                if (!empty($value)) {
+                if (! empty($value)) {
                     $builder->role($value);
                 }
             });
@@ -91,9 +90,9 @@ class UsersTable extends DataTableComponent
         });
 
         $filters[] = SelectFilter::make('E-mail Verified', 'email_verified_at')->options([
-            ''    => 'Any',
+            '' => 'Any',
             'yes' => 'Yes',
-            'no'  => 'No',
+            'no' => 'No',
         ])->filter(function (Builder $builder, string $value) {
             if ($value === 'yes') {
                 $builder->whereNotNull('email_verified_at');
@@ -166,11 +165,12 @@ class UsersTable extends DataTableComponent
             return $this->model::query()->where(function ($query) use ($user) {
                 $query->role('Property Manager')->orWhere('id', $user->id);
             });
-        } else if ($this->account_id && $user->hasManagerAccess()) {
+        } elseif ($this->account_id && $user->hasManagerAccess()) {
             $query = UserEntity::query()->whereIn('entity_key', ['tenant', 'owner', 'agent']);
             $query->where('account_id', $this->account_id);
             $entityIds = $query->pluck('entity_value')->toArray();
             $userIds = array_merge($entityIds, [$this->account_id]);
+
             return $this->model::whereIn('id', $userIds);
         }
     }

@@ -16,6 +16,7 @@ class PasswordExpiredController
     public function expired()
     {
         abort_unless(config('boilerplate.access.user.password_expires_days'), 404);
+
         return view('frontend.auth.passwords.expired');
     }
 
@@ -28,6 +29,7 @@ class PasswordExpiredController
     {
         abort_unless(config('boilerplate.access.user.password_expires_days'), 404);
         $userService->updatePassword($request->user(), $request->only('old_password', 'password'), true);
+
         return redirect()->route('frontend.user.account')->withFlashSuccess(__('Password successfully updated.'));
     }
 }

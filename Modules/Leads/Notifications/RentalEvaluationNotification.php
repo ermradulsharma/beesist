@@ -37,7 +37,7 @@ class RentalEvaluationNotification extends Notification implements ShouldQueue
      */
     public function toMail($notifiable): MailMessage
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject($this->subject)
             ->line(new HtmlString($this->content))
             ->line('If you are unable to provide a reference, please let us know by replying to this email.')

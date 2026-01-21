@@ -18,8 +18,10 @@ class ToBeLoggedOut
             $request->user()->update(['to_be_logged_out' => false]);
             session()->flush();
             auth()->logout();
+
             return redirect()->route('frontend.auth.login');
         }
+
         return $next($request);
     }
 }

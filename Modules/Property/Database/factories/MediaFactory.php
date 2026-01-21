@@ -25,4 +25,3 @@ class MediaFactory extends Factory
         ];
     }
 }
-

@@ -29,12 +29,12 @@ class EmailTemplateController extends Controller
      */
     public function create()
     {
-        $email_template = new EmailTemplate;
+        $email_template = new EmailTemplate();
         $roles = [];
         if (Auth::user()->hasAllAccess()) {
             $roles = Role::where('name', 'Property Manager')->pluck('name');
         } elseif (Auth::user()->hasAManagerAccess()) {
-            
+
             $roles = Role::where('name', 'Agent')->pluck('name');
         } else {
             $roles = Role::all()->pluck('name');
@@ -42,6 +42,7 @@ class EmailTemplateController extends Controller
         $users = User::whereHas('roles', function ($query) use ($roles) {
             $query->whereIn('name', $roles);
         })->get();
+
         return view('cms::email-template.create', compact('email_template', 'roles', 'users'));
     }
 
@@ -52,7 +53,7 @@ class EmailTemplateController extends Controller
      */
     public function store(Request $request)
     {
-        $emailTemplateObj = new EmailTemplate;
+        $emailTemplateObj = new EmailTemplate();
         $emailTemplateObj->title = $request->title;
         $emailTemplateObj->subject = $request->subject;
         $emailTemplateObj->content = $request->content;
@@ -66,6 +67,7 @@ class EmailTemplateController extends Controller
         // $emailTemplateObj->customScript = json_encode($request->customScript);
         $emailTemplateObj->is_active = $request->is_active ?? 0;
         $emailTemplateObj->save();
+
         return redirect()->route('admin.cms.emailTemplate.index')->withFlashSuccess(__('The Email Template was successfully created.'));
     }
 
@@ -105,7 +107,6 @@ class EmailTemplateController extends Controller
         return view('cms::email-template.create', compact('email_template', 'roles', 'users'));
     }
 
-
     /**
      * Update the specified resource in storage.
      *
@@ -127,6 +128,7 @@ class EmailTemplateController extends Controller
         $emailTemplateObj->notify_trigger = $request->notify_trigger;
         $emailTemplateObj->is_active = $request->is_active ?? 0;
         $emailTemplateObj->save();
+
         return redirect()->route('admin.cms.emailTemplate.index')->withFlashSuccess(__('The Email Template was successfully updated.'));
     }
 

@@ -63,12 +63,12 @@ class RentalApplicationController extends Controller
             }
 
             $propertyObj = Property::find($rental_application->prop_id);
-            if (!$propertyObj) {
+            if (! $propertyObj) {
                 Log::error('Property not found for application: ' . $rental_application->id);
             }
 
             $accountObj = UserEntity::where(['entity_key' => 'property', 'entity_value' => $rental_application->prop_id])->first();
-            if (!$accountObj) {
+            if (! $accountObj) {
                 Log::error('Account/UserEntity not found for property: ' . $rental_application->prop_id);
             }
 
@@ -210,7 +210,7 @@ class RentalApplicationController extends Controller
         if ($userEntity) {
             $accountId = $userEntity->account_id;
             $propertiesDetails = UserEntity::with('property')->where(['entity_key' => 'property', 'account_id' => $accountId])->get();
-            $property = $id ? Property::with('featured_image', 'userEntity')->find($id, ['id', 'title', 'address', 'city', 'beds', 'baths', 'sleeps', 'area', 'prop_status', 'rate', 'rateper', 'prop_type']) : new Property;
+            $property = $id ? Property::with('featured_image', 'userEntity')->find($id, ['id', 'title', 'address', 'city', 'beds', 'baths', 'sleeps', 'area', 'prop_status', 'rate', 'rateper', 'prop_type']) : new Property();
             $properties = [];
             foreach ($propertiesDetails as $propertyDetails) {
                 if ($propertyDetails->property) {
@@ -226,7 +226,7 @@ class RentalApplicationController extends Controller
         // $properties = Property::with('featured_image', 'userEntity')->whereRaw("find_in_set('For Rent', prop_status)")->where('status', '1')->select('id', 'title', 'address', 'city')->get();
 
         $countries = Countries();
-        $rental_application = new RentalApplication;
+        $rental_application = new RentalApplication();
 
         $rentalHistories = json_decode($rental_application->rental_history) ?? [];
         $employments = json_decode($rental_application->employment) ?? [];
@@ -436,7 +436,7 @@ class RentalApplicationController extends Controller
     public function screeningRentalApplication(Request $request, $type = 'landlord', $application = null)
     {
         $rental_application = RentalApplication::find(decrypt($application));
-        if (!$rental_application) {
+        if (! $rental_application) {
             abort(404);
         }
 
@@ -477,19 +477,19 @@ class RentalApplicationController extends Controller
         $applicant_name = $rental_application->first_name . ' ' . $rental_application->last_name;
 
         foreach ($questions as $question) {
-            if (!empty($rental_history)) {
+            if (! empty($rental_history)) {
                 $landlordName = ($rental_history[0]['landlord_first_name'] ?? '') . ' ' . ($rental_history[0]['landlord_last_name'] ?? '');
                 $question->question = str_replace('(Landlord name)', trim($landlordName), $question->question);
             }
             $question->question = str_replace('(your name)', $agentName, $question->question);
             $question->question = str_replace('(applicant)', $applicant_name, $question->question);
             $question->question = str_replace('(applicant name)', $applicant_name, $question->question);
-            if (!empty($references)) {
+            if (! empty($references)) {
                 $refName = ($references[0]['first_name'] ?? '') . ' ' . ($references[0]['last_name'] ?? '');
                 $question->question = str_replace('(applicant namey', trim($refName), $question->question);
                 $question->question = str_replace('(applicant name)', trim($refName), $question->question);
             }
-            if (!empty($employment)) {
+            if (! empty($employment)) {
                 $question->question = str_replace('(Employer Contact Name)', $employment[0]['name'] ?? '', $question->question);
             }
         }
@@ -504,7 +504,7 @@ class RentalApplicationController extends Controller
             'rental_history_array' => [],
             'cosigners_array' => [],
             'financial_suitability_array' => [],
-            'picture_id' => null
+            'picture_id' => null,
         ];
 
         if ($request->rental_history) {
@@ -561,17 +561,17 @@ class RentalApplicationController extends Controller
     private function prepareApplicationData(Request $request, array $uploadData, int $status)
     {
         return [
-            'rental_history'        => json_encode($uploadData['rental_history_array']),
-            'employment'            => json_encode($request->employment),
-            'references'            => json_encode($request->references),
-            'cosigners'             => json_encode($uploadData['cosigners_array']),
-            'additional_occupants'  => json_encode($request->additional_occupants),
-            'pets'                  => json_encode($request->pets),
-            'vehicles'              => json_encode($request->vehicles),
+            'rental_history' => json_encode($uploadData['rental_history_array']),
+            'employment' => json_encode($request->employment),
+            'references' => json_encode($request->references),
+            'cosigners' => json_encode($uploadData['cosigners_array']),
+            'additional_occupants' => json_encode($request->additional_occupants),
+            'pets' => json_encode($request->pets),
+            'vehicles' => json_encode($request->vehicles),
             'financial_suitability' => json_encode($uploadData['financial_suitability_array']),
-            'picture_id'            => $uploadData['picture_id'],
-            'status'                => $status,
-            'user_id'               => Auth::check() ? Auth::user()->id : null
+            'picture_id' => $uploadData['picture_id'],
+            'status' => $status,
+            'user_id' => Auth::check() ? Auth::user()->id : null,
         ];
     }
 
@@ -604,6 +604,7 @@ class RentalApplicationController extends Controller
         try {
             if (empty($userObj['user_email'])) {
                 Log::warning('Skipping notification: user_email is missing.');
+
                 return;
             }
             $user = User::where(['email' => $userObj['user_email']])->first();
@@ -619,6 +620,7 @@ class RentalApplicationController extends Controller
             Log::info('Notification email sent successfully to ' . $userObj['user_email']);
         } catch (\Exception $e) {
             Log::error('Notification error: ' . $e->getMessage());
+
             return response()->json(['success' => false, 'msg' => $e->getMessage()]);
         }
     }

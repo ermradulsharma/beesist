@@ -1,35 +1,62 @@
 # Contributing to Beesist
 
-Thank you for considering contributing to the Beesist project!
+First off, thank you for considering contributing to Beesist! It's people like you who make this a great tool for the community.
 
-## Code of Conduct
+## 🏗 Development Workflow
 
-In order to ensure that the Beesist community is welcoming to all, please review and abide by the Code of Conduct.
+Beesist uses a **Modular Monolith** architecture. When adding new features, please consider if they belong in an existing module or if a new module should be created.
 
-## How Can I Contribute?
+### 1. Working with Modules
 
-### Reporting Bugs
+- All new features should ideally reside in the `Modules/` directory.
+- Use artisan commands to generate module components:
 
-- Ensure the bug was not already reported by searching on GitHub under [Issues](issues).
-- If you're unable to find an open issue addressing the problem, open a new one. Be sure to include a title and clear description, as much relevant information as possible, and a code sample or an executable test case demonstrating the expected behavior that is not occurring.
+    ```bash
+    php artisan module:make-controller <ControllerName> <ModuleName>
+    php artisan module:make-model <ModelName> <ModuleName>
+    ```
 
-### Suggested Features
+- Avoid deep coupling between modules. Use events or service classes for cross-module communication.
 
-- Open a new issue and tag it as a feature request.
-- Explain broadly what the feature does and why it is useful.
+### 2. Branching & Pull Requests
 
-### Pull Requests
+1. Fork the repository and create your branch from `main`.
+2. If you've added code that should be tested, add tests.
+3. Ensure the test suite passes (`php artisan test`).
+4. Format your code using `php-cs-fixer`:
 
-1.  Fork the repository.
-2.  Create a new branch (`git checkout -b feature/improvement`).
-3.  Make your changes.
-4.  Run tests to ensure nothing is broken.
-5.  Commit your changes (`git commit -am 'Add new feature'`).
-6.  Push to the branch (`git push origin feature/improvement`).
-7.  Create a Pull Request.
+    ```bash
+    vendor/bin/php-cs-fixer fix
+    ```
 
-## Coding Style
+5. Issue that pull request!
 
-- Follow PSR-12 coding standard.
-- Use meaningful variable and function names.
-- Comment your code where necessary.
+## 🛠 Coding Standards
+
+- **PSR-12**: We strictly follow the PSR-12 coding standard.
+- **Type Hinting**: Use strict typing and return type hints wherever possible.
+- **Naming**: Use descriptive names for variables, functions, and classes.
+- **Blade & Livewire**: Use anonymous blade components for UI elements and keeps Livewire components focused on a single responsibility.
+
+## 🧪 Testing
+
+We aim for high test coverage across all modules.
+
+- **Feature Tests**: Place in `tests/Feature` or within your module's `Tests/Feature` directory.
+- **Unit Tests**: Place in `tests/Unit`.
+
+---
+
+## 🐞 Bug Reports
+
+- Use the GitHub issue tracker.
+- Provide a clear, descriptive title.
+- Include steps to reproduce the issue.
+- Mention your environment (PHP version, OS, etc.).
+
+## 💡 Feature Requests
+
+- Open an issue and describe the proposed change.
+- Explain the use case and why it benefits the project.
+
+We appreciate your help in making Beesist better!

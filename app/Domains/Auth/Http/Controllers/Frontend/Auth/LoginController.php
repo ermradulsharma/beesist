@@ -59,7 +59,7 @@ class LoginController
         $request->validate([
             $this->username() => ['required', 'max:255', 'string'],
             'password' => ['required', 'string', 'max:100'],
-            'g-recaptcha-response' => ['required_if:captcha_status,true', new Captcha],
+            'g-recaptcha-response' => ['required_if:captcha_status,true', new Captcha()],
         ], [
             'g-recaptcha-response.required_if' => __('validation.required', ['attribute' => 'captcha']),
         ]);
@@ -79,6 +79,7 @@ class LoginController
             return $this->guard()->attempt($this->credentials($request), $request->filled('remember'));
         } catch (HttpResponseException $exception) {
             $this->incrementLoginAttempts($request);
+
             throw $exception;
         }
     }
@@ -90,8 +91,9 @@ class LoginController
      */
     protected function authenticated(Request $request, $user)
     {
-        if (!$user->isActive()) {
+        if (! $user->isActive()) {
             Auth::logout();
+
             return redirect()->route('frontend.auth.login')->withFlashDanger(__('Your account has been deactivated.'));
         }
         event(new UserLoggedIn($user));

@@ -2,14 +2,15 @@
 
 namespace Modules\Property\Entities;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 class Building extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
     protected $fillable = [
         'title',
         'slug',
@@ -89,11 +90,13 @@ class Building extends Model
         return \Modules\Property\Database\factories\BuildingFactory::new();
     }
 
-    public function buildingImages() {
+    public function buildingImages()
+    {
         return $this->hasMany(Media::class, 'ref_id', 'id')->where('type', 'building_photos')->orderby('order', 'ASC');
     }
 
-    public function buildingDocuments() {
+    public function buildingDocuments()
+    {
         return $this->hasMany(Media::class, 'ref_id', 'id')->where('type', 'building_strata_documents')->orderby('order', 'ASC');
     }
 

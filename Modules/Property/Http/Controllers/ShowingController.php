@@ -27,7 +27,6 @@ use Modules\Property\Notifications\AgentShowing;
 use Modules\Property\Notifications\DefaultNotification;
 use Modules\Property\Notifications\ShowingRequestNotification;
 use Modules\Property\Notifications\UserShowing;
-use phpDocumentor\Reflection\Types\Null_;
 
 class ShowingController extends Controller
 {
@@ -62,7 +61,7 @@ class ShowingController extends Controller
      */
     public function create()
     {
-        return view('property::showing.create')->withProperty(new Property);
+        return view('property::showing.create')->withProperty(new Property());
     }
 
     /**
@@ -84,7 +83,7 @@ class ShowingController extends Controller
                     $pro_dates = '';
 
                     foreach (['date1', 'date2'] as $dateKey) {
-                        if (!empty($showing[$dateKey])) {
+                        if (! empty($showing[$dateKey])) {
                             $data = [
                                 'prop_id' => $property[0],
                                 'agent_id' => $request->prop_agent,
@@ -101,6 +100,7 @@ class ShowingController extends Controller
                                 userEntity($account_id, 'propertyShowing', $show->id);
                             }
                             $date[] = date_format(date_create($showing[$dateKey]), 'F j, Y, g:i a');
+
                             try {
                                 $pro_dates .= '<b>' . date_format(date_create($showing[$dateKey]), 'F j, Y, g:i a') . '</b>';
                             } catch (\Exception $e) {
@@ -109,7 +109,7 @@ class ShowingController extends Controller
                         }
                     }
 
-                    if (!empty($pro_dates)) {
+                    if (! empty($pro_dates)) {
                         $sch_dates .= '<p>Property Name: ' . ($property[1] ?? '') . '<br>Showing on: <ul>' . $pro_dates . '</ul></p>';
                     }
                 }
@@ -144,7 +144,7 @@ class ShowingController extends Controller
                 $count = 0;
                 foreach ($request->showing_dates as $showing_date) {
 
-                    if (!empty($showing_date['date'])) {
+                    if (! empty($showing_date['date'])) {
                         try {
                             $data = [
                                 'prop_id' => $request->prop_id,
@@ -238,7 +238,7 @@ class ShowingController extends Controller
                 send_sms('+16042656950', $showing->agent->phone, $smsBodyAgent);
             }
 
-            if ($showing->property->occupancy_status == 'tenant' && !empty($showing->property->occupancy_tenant_info)) {
+            if ($showing->property->occupancy_status == 'tenant' && ! empty($showing->property->occupancy_tenant_info)) {
                 $occupancy_tenant_info = json_decode($showing->property->occupancy_tenant_info, true);
                 $tenant_sms_body = 'We have updated the showing schedule of your property at ' . $showing->property->address . ' on ' . date_format(date_create($request->prop_date), 'F j, Y, g:i a') . '. The showing should take about 10-15 minutes';
                 if ($occupancy_tenant_info['tenant_phone']) {
@@ -290,7 +290,7 @@ class ShowingController extends Controller
             }
         }
         $existUser = User::where('email', $request->email)->first();
-        if (!$existUser) {
+        if (! $existUser) {
             $password = Str::random(8);
             $userData = [
                 'name' => $request->fname . ' ' . $request->lname,
@@ -317,7 +317,7 @@ class ShowingController extends Controller
                 return '<h4 style="text-align: center;color:red">Sorry!, this showing date has exceeded the number of maximum attendees.</h4>';
             }
             $currentShowing = ShowingApplication::where(['showing_id' => $request->showing_id, 'property_id' => $request->prop_id, 'tenant_id' => $userId, 'showing_date' => $request->prop_date])->first();
-            if (!$currentShowing) {
+            if (! $currentShowing) {
                 $currentShowing = new ShowingApplication();
             } else {
                 if ($currentShowing->showing_date == $request->prop_date) {
@@ -351,7 +351,7 @@ class ShowingController extends Controller
                 if ($agentObj->phone) {
                     send_sms('+16042656950', $agentObj->phone, $reschedule_sms_body);
                 }
-                if ($show_property->property->occupancy_status == 'tenant' && !empty($show_property->property->occupancy_tenant_info)) {
+                if ($show_property->property->occupancy_status == 'tenant' && ! empty($show_property->property->occupancy_tenant_info)) {
                     $occupancy_tenant_info = json_decode($show_property->property->occupancy_tenant_info, true);
                     if ($occupancy_tenant_info['tenant_phone']) {
                         send_sms('+16042656950', $occupancy_tenant_info['tenant_phone'], $reschedule_sms_body);
@@ -484,7 +484,7 @@ class ShowingController extends Controller
                 if ($request->phone) {
                     send_sms('+16042656950', $request->phone, $user_sms_body);
                 }
-                if ($show_property->property->occupancy_status == 'tenant' && !empty($show_property->property->occupancy_tenant_info)) {
+                if ($show_property->property->occupancy_status == 'tenant' && ! empty($show_property->property->occupancy_tenant_info)) {
                     $occupancy_tenant_info = json_decode($show_property->property->occupancy_tenant_info, true);
                     $tenant_sms_body = 'We have a confirmed showing of your property at ' . $show_property->property->address . ' on ' . date_format(date_create($request->prop_date), 'F j, Y, g:i a') . '. The showing should take about 10-15 minutes';
                     if ($occupancy_tenant_info['tenant_phone']) {
@@ -531,12 +531,12 @@ class ShowingController extends Controller
     public function showingRequestStatus(Request $request, $id)
     {
         $validStatus = ['approved', 'rejected', 'removed'];
-        if (!in_array($request->status, $validStatus)) {
+        if (! in_array($request->status, $validStatus)) {
             return response()->json(['error' => 'Invalid status provided', 'status' => 400]);
         }
 
         $showingApplication = ShowingApplication::find($id);
-        if (!$showingApplication) {
+        if (! $showingApplication) {
             return response()->json(['error' => 'Showing application with ID ' . $id . ' not found', 'status' => 404]);
         }
 
@@ -567,6 +567,7 @@ class ShowingController extends Controller
                 <p>Unfortunately, our property managers are not able to accommodate late arrivals and we cannot guarantee you that we will be able to show you the place if you arrived late.</p>
                 <p>Thank you for respecting the time of the showing.</p>
                 <p>Please do not hesitate to contact us, if you have any questions.</p>';
+
             try {
                 $applicationData->notify(new ShowingRequestNotification($applicationData, $body, $subject));
             } catch (\Exception $e) {
@@ -607,12 +608,13 @@ class ShowingController extends Controller
                 $owner = ($property->occupancy_status == 'owner_occupied') ? getUserById($property->user_id) : json_decode($property->occupancy_tenant_info, true);
                 $ownerName = extract_name($owner->name)['first_name'];
                 $ownerMail = ($property->occupancy_status == 'owner_occupied') ? $owner->email : $owner['tenant_email'];
-                if (!empty($ownerName) && !empty($ownerMail)) {
+                if (! empty($ownerName) && ! empty($ownerMail)) {
                     $ownerEmailBody = '<p>A showing has been confirmed for (' . $applicationData->showing_date . ').<br>
                     Property Name: ' . $applicationData->property->title . '<br>
                     Property Address: ' . $applicationData->property->address . '<br>
                     The agent (agent name and phone number), will arrive at the property at the time of the showing.</p>
                     <p>Please let us know if you have any questions.</p>';
+
                     try {
                         $owner->notify(new ShowingRequestNotification($applicationData, $ownerEmailBody, $subject));
                     } catch (\Exception $e) {
@@ -643,6 +645,7 @@ class ShowingController extends Controller
                         <tr><td align="left" valign="top">Reason of Rejection: </td><td valign="top">' . $applicationData->reason_of_rejection . '</td></tr>
                     </tbody>
 				</table>';
+
             try {
                 $applicationData->notify(new ShowingRequestNotification($applicationData, $body, $subject));
             } catch (\Exception $e) {
@@ -789,6 +792,7 @@ class ShowingController extends Controller
             $title = 'Viewing Already Canceled';
             $desc = '<p>Dear ' . $name . '</p>';
             $desc .= '<p>Your viewing request for property <strong>' . $title . '</strong> located <strong>' . $address . '</strong> at <strong>' . $showingDate . '</strong> with Manager/Agent <strong>' . $manageBy . '</strong> is already canceled.</p>';
+
             return view('property::showing.notify-page', compact('title', 'desc'));
         }
 
@@ -799,7 +803,7 @@ class ShowingController extends Controller
         $this->sendNotification($manager, $showingApplication, $name, $title, $address, $showingDate, $manageBy, $msg);
 
         // Notification For Agent
-        if (!is_null($showingApplication->agent_id) || $showingApplication->agent_id !== 0) {
+        if (! is_null($showingApplication->agent_id) || $showingApplication->agent_id !== 0) {
             $agent = User::find($showingApplication->agent_id);
             $this->sendNotification($agent, $showingApplication, $name, $title, $address, $showingDate, $manageBy, $msg);
         }
@@ -821,7 +825,7 @@ class ShowingController extends Controller
             }
         }
 
-        if ($showingApplication->property->occupancy_status == 'tenant' && !empty($showingApplication->property->occupancy_tenant_info)) {
+        if ($showingApplication->property->occupancy_status == 'tenant' && ! empty($showingApplication->property->occupancy_tenant_info)) {
             $occupancyTenantInfo = json_decode($showingApplication->property->occupancy_tenant_info, true);
             if ($occupancyTenantInfo['tenant_phone']) {
                 send_sms("+16042656950", $occupancyTenantInfo['tenant_phone'], $msg);
@@ -830,6 +834,7 @@ class ShowingController extends Controller
         $title = 'Viewing Canceled';
         $desc = '<p>Dear ' . $name . '</p>';
         $desc .= '<p>Your viewing request for property <strong>' . $title . '</strong> located <strong>' . $address . '</strong> at <strong>' . $showingDate . '</strong> with Agent <strong>' . $manageBy . '</strong> has been canceled successfully.</p>';
+
         return view('property::showing.notify-page', compact('title', 'desc'));
     }
 

@@ -33,7 +33,7 @@ trait UserAttribute
             return 'All';
         }
 
-        if (!$this->permissions->count()) {
+        if (! $this->permissions->count()) {
             return 'None';
         }
 
@@ -49,7 +49,7 @@ trait UserAttribute
             return 'All';
         }
 
-        if (!$this->roles->count()) {
+        if (! $this->roles->count()) {
             return 'None';
         }
 

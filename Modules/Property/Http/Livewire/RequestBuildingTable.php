@@ -74,6 +74,7 @@ class RequestBuildingTable extends DataTableComponent
             Column::make(__('Title'), 'title')->sortable()->searchable(),
             Column::make(__('Address'), 'location')->format(function ($value) {
                 $locationData = json_decode($value, true);
+
                 return $locationData['address'].', '.$locationData['city'].', '.$locationData['state'].', '.$locationData['country'].', '.$locationData['zip'];
             })->sortable()->searchable(),
             Column::make('Status', 'status')->format(function ($value) {

@@ -7,6 +7,7 @@ use Illuminate\Foundation\Http\FormRequest;
 class TenantRequest extends FormRequest
 {
     protected $json_fields = ['form_k_notice', 'property_address', 'adult_fullnames', 'minor_fullnames', 'rental_period', 'security'];
+
     // protected $json_fields = ['form_k_notice', 'property_address', 'adult_fullnames', 'minor_fullnames', 'rental_period', 'security'];
     /**
      * Get the validation rules that apply to the request.
@@ -24,7 +25,6 @@ class TenantRequest extends FormRequest
         return $rules;
     }
 
-
     /**
      * Get the validation messages that apply to the request.
      *
@@ -36,7 +36,6 @@ class TenantRequest extends FormRequest
             'required' => 'This field is required.',
         ];
     }
-
 
     /**
      * Determine if the user is authorized to make this request.

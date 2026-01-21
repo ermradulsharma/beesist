@@ -13,7 +13,7 @@ class CreateTwoFactorAuthenticationsTable extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('two_factor_authentications')) {
+        if (! Schema::hasTable('two_factor_authentications')) {
             Schema::create('two_factor_authentications', function (Blueprint $table) {
                 $table->bigIncrements('id');
                 $table->morphs('authenticatable', '2fa_auth_type_auth_id_index');

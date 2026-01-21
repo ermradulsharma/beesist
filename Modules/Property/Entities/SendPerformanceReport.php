@@ -2,8 +2,8 @@
 
 namespace Modules\Property\Entities;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Property\Database\factories\SendPerformanceReportFactory;
 
 class SendPerformanceReport extends Model

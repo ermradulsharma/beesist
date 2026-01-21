@@ -1,4 +1,5 @@
 <?php
+
 use App\Domains\Auth\Http\Controllers\Backend\User\UserController;
 
 Route::group(['prefix' => 'auth', 'as' => 'auth.', 'middleware' => config('boilerplate.access.middleware.confirm')], function () {

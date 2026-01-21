@@ -3,19 +3,20 @@
 namespace App\Jobs;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Modules\Property\Entities\Media;
-use Illuminate\Support\Facades\File;
-
 
 class UploadFileJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     protected $file;
     protected $id;
@@ -49,17 +50,18 @@ class UploadFileJob implements ShouldQueue
         $allowedFileTypes = array_merge($allowedImageTypes, ['pdf']);
         $allowedTypes = ($type == 'building_photos') ? $allowedImageTypes : $allowedFileTypes;
         $fileExtension = strtolower($file->getClientOriginalExtension());
-        if (!in_array($fileExtension, $allowedTypes)) {
+        if (! in_array($fileExtension, $allowedTypes)) {
             Log::warning('Unsupported file type uploaded: ' . $fileExtension);
+
             return;
         }
 
         $baseDir = public_path('uploads/buildings/' . $id . '/');
-        if (!File::isDirectory($baseDir)) {
+        if (! File::isDirectory($baseDir)) {
             File::makeDirectory($baseDir, 0777, true, true);
         }
         $typeDir = $baseDir . '/' . $type;
-        if (!File::isDirectory($typeDir)) {
+        if (! File::isDirectory($typeDir)) {
             File::makeDirectory($typeDir, 0777, true, true);
         }
         chmod($baseDir, 0777);
@@ -67,7 +69,7 @@ class UploadFileJob implements ShouldQueue
         $original = $typeDir . '/original';
 
         foreach ([$dirThumb, $original] as $directory) {
-            if (!File::isDirectory($directory)) {
+            if (! File::isDirectory($directory)) {
                 File::makeDirectory($directory, 0777, true, true);
             }
         }
@@ -75,7 +77,7 @@ class UploadFileJob implements ShouldQueue
         $fileName = generateFileName($file);
         if ($fileExtension == 'pdf') {
             $fileName = generateFileName($file);
-            if (!File::isDirectory($typeDir)) {
+            if (! File::isDirectory($typeDir)) {
                 File::makeDirectory($typeDir, 0777, true, true);
             }
             $file->move($typeDir, $fileName);

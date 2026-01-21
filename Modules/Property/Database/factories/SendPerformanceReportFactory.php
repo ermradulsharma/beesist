@@ -19,4 +19,3 @@ class SendPerformanceReportFactory extends Factory
         return [];
     }
 }
-

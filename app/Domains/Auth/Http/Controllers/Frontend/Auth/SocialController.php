@@ -27,12 +27,14 @@ class SocialController
     public function callback($provider, UserService $userService)
     {
         $user = $userService->registerProvider(Socialite::driver($provider)->user(), $provider);
-        if (!$user->isActive()) {
+        if (! $user->isActive()) {
             auth()->logout();
+
             return redirect()->route('frontend.auth.login')->withFlashDanger(__('Your account has been deactivated.'));
         }
         auth()->login($user);
         event(new UserLoggedIn($user));
+
         return redirect()->route(homeRoute());
     }
 }

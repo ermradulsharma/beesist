@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\URL;
 class WelcomeEmailNotification extends Notification
 {
     use Queueable;
-    public $user, $password;
+    public $user;
+    public $password;
 
     /**
      * Create a new notification instance.
@@ -45,7 +46,7 @@ class WelcomeEmailNotification extends Notification
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->greeting(__('Hello ' . $this->user->first_name . ','))
             ->subject(__('Verify Email Address'))
             ->line(__('Please click the button below to verify your email address.'))

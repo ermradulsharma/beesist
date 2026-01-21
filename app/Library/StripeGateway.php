@@ -2,8 +2,6 @@
 
 namespace App\Library;
 
-use App\Models\Setting;
-use Stripe;
 use Exception;
 
 class StripeGateway
@@ -18,11 +16,12 @@ class StripeGateway
         \Stripe\Stripe::setApiKey(config('mail.stripe.secret_key'));
     }
 
-    public static function createToken($card = NULL)
+    public static function createToken($card = null)
     {
         $response = [];
-        $response['success'] = FALSE;
+        $response['success'] = false;
         $response['message'] = "";
+
         try {
             $stripe = new \Stripe\StripeClient(
                 config('mail.stripe.secret_key')
@@ -38,7 +37,7 @@ class StripeGateway
 
             if ($tokenObj) {
                 $response['token'] = $tokenObj->id;
-                $response['success'] = TRUE;
+                $response['success'] = true;
             }
         } catch (\Stripe\Exception\CardException $e) {
             $response['message'] = $e->getError()->message;
@@ -67,21 +66,23 @@ class StripeGateway
             $response['message'] = $e->getMessage();
             $response['code'] = "";
         }
+
         return $response;
     }
 
     public static function createCustomer($data = [])
     {
         $response = [];
-        $response['success'] = FALSE;
+        $response['success'] = false;
+
         try {
             self::setStripeApiKey();
 
-            $customerObj = \Stripe\Customer::create(array(
+            $customerObj = \Stripe\Customer::create([
                 'email' => $data['email'],
-                'source'  => $data['token']
-            ));
-            $response['success'] = TRUE;
+                'source' => $data['token'],
+            ]);
+            $response['success'] = true;
             $response['data'] = $customerObj;
         } catch (\Stripe\Exception\CardException $e) {
             $response['message'] = $e->getError()->message;
@@ -105,13 +106,14 @@ class StripeGateway
             $response['message'] = $e->getMessage();
             $response['code'] = "";
         }
+
         return $response;
     }
 
     public static function createChargeOld($orderData = [])
     {
         $response = [];
-        $response['success'] = FALSE;
+        $response['success'] = false;
 
         /* $orderData = [
             'customer' => $orderData['stripe_customer_id'],
@@ -127,7 +129,7 @@ class StripeGateway
         $adminAmount = round($adminAmount);
         $restaurantAmount = round($restaurantAmount);
 
-        if (isset($orderData['stripe_connected_account_id']) && !empty($orderData['stripe_connected_account_id'])) {
+        if (isset($orderData['stripe_connected_account_id']) && ! empty($orderData['stripe_connected_account_id'])) {
             $stripeData = [
                 'customer' => $orderData['stripe_customer_id'],
                 'amount' => $adminAmount,
@@ -137,7 +139,7 @@ class StripeGateway
                     //"amount" => 100,
                     "amount" => $restaurantAmount,
                     "destination" => $orderData['stripe_connected_account_id'],
-                ]
+                ],
             ];
         } else {
             $stripeData = [
@@ -154,7 +156,7 @@ class StripeGateway
             $chargeObj = \Stripe\Charge::create($stripeData);
 
             $response['data'] = $chargeObj;
-            $response['success'] = TRUE;
+            $response['success'] = true;
         } catch (\Stripe\Exception\CardException $e) {
             $response['message'] = $e->getError()->message;
             $response['code'] = $e->getError()->code;
@@ -177,13 +179,14 @@ class StripeGateway
             $response['message'] = $e->getMessage();
             $response['code'] = "";
         }
+
         return $response;
     }
 
     public static function createCharge($paymentData = [])
     {
         $response = [];
-        $response['success'] = FALSE;
+        $response['success'] = false;
 
         try {
             self::setStripeApiKey();
@@ -204,7 +207,7 @@ class StripeGateway
             ]);
 
             $response['data'] = $ssss;
-            $response['success'] = TRUE;
+            $response['success'] = true;
         } catch (\Stripe\Exception\CardException $e) {
             $response['message'] = $e->getError()->message;
             $response['code'] = $e->getError()->code;
@@ -227,14 +230,15 @@ class StripeGateway
             $response['message'] = $e->getMessage();
             $response['code'] = "";
         }
+
         //print_pre($response);
         return $response;
     }
 
-    public static function createCard($card = NULL)
+    public static function createCard($card = null)
     {
         $response = [];
-        $response['success'] = FALSE;
+        $response['success'] = false;
 
         try {
             self::setStripeApiKey();
@@ -242,7 +246,7 @@ class StripeGateway
             $token = $card['token'];
             $customer = \Stripe\Customer::retrieve($card['stripe_customer_id']);
             if ($customer->sources) {
-                $card = $customer->sources->create(array("source" => $token));
+                $card = $customer->sources->create(["source" => $token]);
             } else {
                 $stripe = new \Stripe\StripeClient(
                     config('mail.stripe.secret_key')
@@ -255,7 +259,7 @@ class StripeGateway
 
             //return $card;
 
-            $response['success'] = TRUE;
+            $response['success'] = true;
             $response['card'] = $card;
         } catch (\Stripe\Exception\CardException $e) {
             $response['message'] = $e->getError()->message;
@@ -279,13 +283,14 @@ class StripeGateway
             $response['message'] = $e->getMessage();
             $response['code'] = "";
         }
+
         return $response;
     }
 
-    public static function deleteCard($card = NULL)
+    public static function deleteCard($card = null)
     {
         $response = [];
-        $response['success'] = FALSE;
+        $response['success'] = false;
 
         try {
             self::setStripeApiKey();
@@ -301,7 +306,7 @@ class StripeGateway
             );
 
             if ($result->deleted) {
-                $response['success'] = TRUE;
+                $response['success'] = true;
             }
         } catch (\Stripe\Exception\CardException $e) {
             $response['message'] = $e->getError()->message;
@@ -325,20 +330,23 @@ class StripeGateway
             $response['message'] = $e->getMessage();
             $response['code'] = "";
         }
+
         return $response;
-        return FALSE;
+
+        return false;
     }
 
     public static function createAccount($data = [])
     {
         $response = [];
-        $response['success'] = FALSE;
+        $response['success'] = false;
+
         try {
             self::setStripeApiKey();
 
             $stripe = new \Stripe\StripeClient([
                 "api_key" => config('mail.stripe.secret_key'),
-                "stripe_version" => "2020-08-27"
+                "stripe_version" => "2020-08-27",
             ]);
 
 
@@ -375,7 +383,7 @@ class StripeGateway
                 'tos_acceptance' => $termCondition,
             ]);
 
-            $response['success'] = TRUE;
+            $response['success'] = true;
             $response['data'] = $accountObj;
         } catch (\Stripe\Exception\CardException $e) {
             $response['message'] = $e->getError()->message;
@@ -399,6 +407,7 @@ class StripeGateway
             $response['message'] = $e->getMessage();
             $response['code'] = "";
         }
+
         //print_pre($response);
         return $response;
     }
@@ -406,13 +415,14 @@ class StripeGateway
     public static function createExternalAccount($data = [])
     {
         $response = [];
-        $response['success'] = FALSE;
+        $response['success'] = false;
+
         try {
             self::setStripeApiKey();
 
             $stripe = new \Stripe\StripeClient([
                 "api_key" => config('mail.stripe.secret_key'),
-                "stripe_version" => "2020-08-27"
+                "stripe_version" => "2020-08-27",
             ]);
             if ($data['country'] == 'US') {
                 $countryData = [
@@ -443,7 +453,7 @@ class StripeGateway
                 'tos_acceptance' => $termCondition,
             ]);
 
-            $response['success'] = TRUE;
+            $response['success'] = true;
             $response['data'] = $accountObj;
         } catch (\Stripe\Exception\CardException $e) {
             $response['message'] = $e->getError()->message;
@@ -467,6 +477,7 @@ class StripeGateway
             $response['message'] = $e->getMessage();
             $response['code'] = "";
         }
+
         //print_pre($response);
         return $response;
     }
@@ -474,13 +485,14 @@ class StripeGateway
     public static function getStripeCustomer($data = [])
     {
         $response = [];
-        $response['success'] = FALSE;
+        $response['success'] = false;
+
         try {
             self::setStripeApiKey();
 
             $stripe = new \Stripe\StripeClient([
                 "api_key" => config('mail.stripe.secret_key'),
-                "stripe_version" => "2020-08-27"
+                "stripe_version" => "2020-08-27",
             ]);
 
             $accountObj = $stripe->accounts->retrieve(
@@ -488,7 +500,7 @@ class StripeGateway
                 []
             );
 
-            $response['success'] = TRUE;
+            $response['success'] = true;
             $response['data'] = $accountObj;
         } catch (\Stripe\Exception\CardException $e) {
             $response['message'] = $e->getError()->message;
@@ -512,6 +524,7 @@ class StripeGateway
             $response['message'] = $e->getMessage();
             $response['code'] = "";
         }
+
         //print_pre($response);
         return $response;
     }
@@ -519,13 +532,14 @@ class StripeGateway
     public static function updateAccount($data = [])
     {
         $response = [];
-        $response['success'] = FALSE;
+        $response['success'] = false;
+
         try {
             self::setStripeApiKey();
 
             $stripe = new \Stripe\StripeClient([
                 "api_key" => config('mail.stripe.secret_key'),
-                "stripe_version" => "2020-08-27"
+                "stripe_version" => "2020-08-27",
             ]);
 
             $individual = [
@@ -544,10 +558,10 @@ class StripeGateway
                     'state' => $data['address']['state'],
                 ],
                 'email' => $data['email'],
-                'phone' => $data['mobile']
+                'phone' => $data['mobile'],
 
             ];
-            if (!empty($data['ssn_last_4'])) {
+            if (! empty($data['ssn_last_4'])) {
                 $individual['ssn_last_4'] = $data['ssn_last_4'];
             }
             if ($data['country'] == 'US') {
@@ -568,7 +582,7 @@ class StripeGateway
                     'business_type' => 'individual',
                     'business_profile' => [
                         'mcc' => 1520,
-                        'product_description' => 'Property owner.'
+                        'product_description' => 'Property owner.',
                     ],
                     'individual' => $individual,
                     'tos_acceptance' => $termCondition,
@@ -576,7 +590,7 @@ class StripeGateway
                 ]
             );
 
-            $response['success'] = TRUE;
+            $response['success'] = true;
             $response['data'] = $accountObj;
         } catch (\Stripe\Exception\CardException $e) {
             $response['message'] = $e->getError()->message;
@@ -600,13 +614,16 @@ class StripeGateway
             $response['message'] = $e->getMessage();
             $response['code'] = "";
         }
+
         //print_pre($response);
         return $response;
     }
+
     public static function getAccountById($accountId)
     {
         $response = [];
-        $response['success'] = FALSE;
+        $response['success'] = false;
+
         try {
             self::setStripeApiKey();
 
@@ -619,7 +636,7 @@ class StripeGateway
                 []
             );
 
-            $response['success'] = TRUE;
+            $response['success'] = true;
             $response['data'] = $accountObj;
         } catch (\Stripe\Exception\CardException $e) {
             $response['message'] = $e->getError()->message;
@@ -643,6 +660,7 @@ class StripeGateway
             $response['message'] = $e->getMessage();
             $response['code'] = "";
         }
+
         //print_pre($response);
         return $response;
     }
@@ -650,7 +668,8 @@ class StripeGateway
     public static function createBank($data = [])
     {
         $response = [];
-        $response['success'] = FALSE;
+        $response['success'] = false;
+
         try {
             self::setStripeApiKey();
 
@@ -684,7 +703,7 @@ class StripeGateway
                 ]
             );
 
-            $response['success'] = TRUE;
+            $response['success'] = true;
             $response['data'] = $bankObj;
         } catch (\Stripe\Exception\CardException $e) {
             $response['message'] = $e->getError()->message;
@@ -708,6 +727,7 @@ class StripeGateway
             $response['message'] = $e->getMessage();
             $response['code'] = "";
         }
+
         //print_pre($response);
         return $response;
     }
@@ -715,7 +735,8 @@ class StripeGateway
     public static function deleteBank($data = [])
     {
         $response = [];
-        $response['success'] = FALSE;
+        $response['success'] = false;
+
         try {
             self::setStripeApiKey();
 
@@ -729,7 +750,7 @@ class StripeGateway
                 []
             );
 
-            $response['success'] = TRUE;
+            $response['success'] = true;
             $response['data'] = $bankObj;
         } catch (\Stripe\Exception\CardException $e) {
             $response['message'] = $e->getError()->message;
@@ -753,6 +774,7 @@ class StripeGateway
             $response['message'] = $e->getMessage();
             $response['code'] = "";
         }
+
         //print_pre($response);
         return $response;
     }
@@ -760,7 +782,8 @@ class StripeGateway
     public static function transfer($data = [])
     {
         $response = [];
-        $response['success'] = FALSE;
+        $response['success'] = false;
+
         try {
             self::setStripeApiKey();
 
@@ -778,7 +801,7 @@ class StripeGateway
                 //'destination' => 'ba_1JcrtdRfZbG2fKxKdRe6ndxN',
             ]);
 
-            $response['success'] = TRUE;
+            $response['success'] = true;
             $response['data'] = $transferObj;
         } catch (\Stripe\Exception\CardException $e) {
             $response['message'] = $e->getError()->message;
@@ -802,6 +825,7 @@ class StripeGateway
             $response['message'] = $e->getMessage();
             $response['code'] = "";
         }
+
         //print_pre($response);
         return $response;
     }

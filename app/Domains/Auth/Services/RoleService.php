@@ -33,6 +33,7 @@ class RoleService extends BaseService
     public function store(array $data = []): Role
     {
         DB::beginTransaction();
+
         try {
             $role = $this->model::create(['type' => $data['type'], 'name' => $data['name']]);
             $permissions = $data['permissions'] ?? [];
@@ -41,10 +42,12 @@ class RoleService extends BaseService
         } catch (Exception $e) {
             DB::rollBack();
             Log::error($e->getMessage());
+
             throw new GeneralException(__('There was a problem creating the role.'));
         }
         event(new RoleCreated($role));
         DB::commit();
+
         return $role;
     }
 
@@ -55,6 +58,7 @@ class RoleService extends BaseService
     public function update(Role $role, array $data = []): Role
     {
         DB::beginTransaction();
+
         try {
             $roleData = [
                 'type' => $data['type'] ?? $role->type,
@@ -67,10 +71,12 @@ class RoleService extends BaseService
         } catch (Exception $e) {
             DB::rollBack();
             Log::error($e->getMessage());
+
             throw new GeneralException(__('There was a problem updating the role.'));
         }
         event(new RoleUpdated($role));
         DB::commit();
+
         return $role;
     }
 
@@ -84,8 +90,10 @@ class RoleService extends BaseService
         }
         if ($this->deleteById($role->id)) {
             event(new RoleDeleted($role));
+
             return true;
         }
+
         throw new GeneralException(__('There was a problem deleting the role.'));
     }
 }

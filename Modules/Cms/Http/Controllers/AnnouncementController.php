@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Validator;
 
 class AnnouncementController extends Controller
@@ -36,7 +35,7 @@ class AnnouncementController extends Controller
         $rules = [
             'area' => 'required',
             'type' => 'required',
-            'message' => 'required'
+            'message' => 'required',
         ];
         $messages = [
             'area.required' => 'The area field is required.',
@@ -58,6 +57,7 @@ class AnnouncementController extends Controller
         } else {
             Announcement::create($data);
         }
+
         return back()->withFlashSuccess(__('Announcement saved successfully.'));
     }
 

@@ -3,11 +3,9 @@
 namespace Modules\Tenant\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\HtmlString;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Support\Facades\Crypt;
+use Illuminate\Notifications\Notification;
+use Illuminate\Support\HtmlString;
 
 class TenantAgreementNotification extends Notification
 {
@@ -76,6 +74,7 @@ class TenantAgreementNotification extends Notification
                 $message->attach($this->attachment);
             }
         }
+
         return $message;
     }
 

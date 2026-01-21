@@ -15,7 +15,7 @@ use Modules\Leads\Http\Controllers\LeadsController;
 use Modules\Leads\Http\Controllers\RentalEvaluationController;
 use Tabuna\Breadcrumbs\Trail;
 
-if (!function_exists('pmaRoutes')) {
+if (! function_exists('pmaRoutes')) {
     function pmaRoutes($role)
     {
         Route::prefix('pma')->name('pma.')->group(function () use ($role) {

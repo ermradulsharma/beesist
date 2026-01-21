@@ -2,7 +2,6 @@
 
 namespace App\Domains\Auth\Http\Requests\Backend\User;
 
-use Auth;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -19,10 +18,11 @@ class EditUserRequest extends FormRequest
     public function authorize()
     {
         if ($this->user()) {
-            return !($this->user->isAdmin() && !$this->user()->isAdmin());
-        } else if ($this->user()->hasManagerAccess()) {
-            return !($this->user->isManager() && !$this->user()->isManager());
+            return ! ($this->user->isAdmin() && ! $this->user()->isAdmin());
+        } elseif ($this->user()->hasManagerAccess()) {
+            return ! ($this->user->isManager() && ! $this->user()->isManager());
         }
+
         return false;
     }
 

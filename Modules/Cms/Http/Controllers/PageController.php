@@ -31,7 +31,7 @@ class PageController extends Controller
      */
     public function create()
     {
-        return view('cms::pages.create')->withPage(new Page);
+        return view('cms::pages.create')->withPage(new Page());
     }
 
     /**

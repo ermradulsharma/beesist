@@ -3,10 +3,9 @@
 namespace Modules\Tenant\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\HtmlString;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
+use Illuminate\Support\HtmlString;
 
 class NewUser extends Notification
 {
@@ -42,7 +41,7 @@ class NewUser extends Notification
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage)
+        return (new MailMessage())
         ->from($this->mailData['from_email'], $this->mailData['from_name'])
         ->subject($this->mailData['subject'])
         ->greeting('Hello ' . $this->mailData['user_name'])

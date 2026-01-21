@@ -2,7 +2,6 @@
 
 namespace Modules\Property\Http\Controllers;
 
-use Illuminate\Validation\ValidationException;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -10,10 +9,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use Modules\Leads\Entities\UserEntity;
+use Illuminate\Validation\ValidationException;
 use Modules\Property\Entities\Building;
 use Modules\Property\Entities\Media;
-
 
 class BuildingController extends Controller
 {
@@ -24,6 +22,7 @@ class BuildingController extends Controller
     public function index()
     {
         $countries = Countries();
+
         return view('property::building.index', compact('countries'));
     }
 
@@ -36,6 +35,7 @@ class BuildingController extends Controller
             $properties = $properties->where(['status' => 1]);
         }
         $properties = $properties->orderByDesc('id')->get();
+
         return view('property::building.frontend.buildings', compact('properties'));
     }
 
@@ -47,7 +47,8 @@ class BuildingController extends Controller
     {
         $countries = Countries();
         $buildingObjs = Building::all();
-        return view('property::building.create', compact('countries', 'buildingObjs'))->withBuilding(new Building);
+
+        return view('property::building.create', compact('countries', 'buildingObjs'))->withBuilding(new Building());
     }
 
     /**
@@ -58,7 +59,7 @@ class BuildingController extends Controller
     public function store(Request $request)
     {
         try {
-            if (!Auth::user()->hasAllAccess()) {
+            if (! Auth::user()->hasAllAccess()) {
                 return redirect()->back()->withFlashDanger(__('You do not have access to do that.'));
             }
             $validationRules = [
@@ -90,7 +91,7 @@ class BuildingController extends Controller
             $buildingObj = Building::create($data);
             $building_id = $buildingObj->id;
             userEntity(Auth::user()->id, 'building', $building_id);
-            
+
             // Upload Strata Files
             if ($request->hasFile('building_strata_documents')) {
                 foreach ($request->file('building_strata_documents') as $stratafile) {
@@ -105,7 +106,7 @@ class BuildingController extends Controller
                         'building_photos.*' => 'mimes:jpeg,png,jpg,gif,svg',
                     ];
                     $messages = [
-                        'building_photos.mimes' => "Please upload jpeg, png, jpg, gif, svg format image"
+                        'building_photos.mimes' => "Please upload jpeg, png, jpg, gif, svg format image",
                     ];
                     $validation = Validator::make($request->all(), $rules, $messages);
                     if ($validation->fails()) {
@@ -120,6 +121,7 @@ class BuildingController extends Controller
             return redirect()->back()->withErrors($e->validator->getMessageBag())->withInput();
         } catch (\Exception $e) {
             Log::error('Error in building creation: ' . $e->getMessage());
+
             return redirect()->back()->withErrors(['error' => 'An error occurred. Please try again.'])->withInput();
         }
     }
@@ -130,17 +132,18 @@ class BuildingController extends Controller
         $allowedFileTypes = array_merge($allowedImageTypes, ['pdf']);
         $allowedTypes = ($type == 'building_photos') ? $allowedImageTypes : $allowedFileTypes;
         $fileExtension = strtolower($file->getClientOriginalExtension());
-        if (!in_array($fileExtension, $allowedTypes)) {
+        if (! in_array($fileExtension, $allowedTypes)) {
             Log::warning('Unsupported file type uploaded: ' . $fileExtension);
+
             return;
         }
 
         $baseDir = public_path('uploads/buildings/' . $building_id . '/');
-        if (!File::isDirectory($baseDir)) {
+        if (! File::isDirectory($baseDir)) {
             File::makeDirectory($baseDir, 0777, true, true);
         }
         $typeDir = $baseDir . '/' . $type;
-        if (!File::isDirectory($typeDir)) {
+        if (! File::isDirectory($typeDir)) {
             File::makeDirectory($typeDir, 0777, true, true);
         }
         chmod($baseDir, 0777);
@@ -148,7 +151,7 @@ class BuildingController extends Controller
         $original = $typeDir . '/original';
 
         foreach ([$dirThumb, $original] as $directory) {
-            if (!File::isDirectory($directory)) {
+            if (! File::isDirectory($directory)) {
                 File::makeDirectory($directory, 0777, true, true);
             }
         }
@@ -156,7 +159,7 @@ class BuildingController extends Controller
         $fileName = generateFileName($file);
         if ($fileExtension == 'pdf') {
             $fileName = generateFileName($file);
-            if (!File::isDirectory($typeDir)) {
+            if (! File::isDirectory($typeDir)) {
                 File::makeDirectory($typeDir, 0777, true, true);
             }
             $file->move($typeDir, $fileName);
@@ -178,7 +181,6 @@ class BuildingController extends Controller
         Media::create($attachArray);
     }
 
-
     /**
      * Show the specified resource.
      * @param int $id
@@ -197,6 +199,7 @@ class BuildingController extends Controller
     public function edit($building)
     {
         $building = Building::find($building);
+
         return view('property::building.create', compact('building'));
     }
 
@@ -209,7 +212,7 @@ class BuildingController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            if (!Auth::user()->hasAllAccess()) {
+            if (! Auth::user()->hasAllAccess()) {
                 return redirect()->back()->withFlashDanger(__('You do not have access to do that.'));
             }
             $validationRules = [
@@ -260,15 +263,16 @@ class BuildingController extends Controller
                     $this->uploadFile($buildingPhoto, $id, 'building_photos');
                 }
             }
+
             return redirect()->route(rolebased() . '.buildings.index')->withFlashSuccess(__('The building was successfully updated.'));
         } catch (ValidationException $e) {
             return redirect()->back()->withErrors($e->validator->getMessageBag())->withInput();
         } catch (\Exception $e) {
             Log::error('Error in building update: ' . $e->getMessage());
+
             return redirect()->back()->withErrors(['error' => 'An error occurred. Please try again.'])->withInput();
         }
     }
-
 
     /**
      * Remove the specified resource from storage.
@@ -297,6 +301,7 @@ class BuildingController extends Controller
                     if (isset($data['id'])) {
                         $content = \Modules\FormBuilder\Entities\Helper::formShortcode($data['id']);
                     }
+
                     return $content;
                 },
             ];
@@ -317,13 +322,14 @@ class BuildingController extends Controller
             $this->deleteMedia($document->id);
         });
         $building->delete();
+
         return response()->json('Removed');
     }
 
     private function deleteMedia($id = null)
     {
         $file = Media::find($id);
-        if (!$file) {
+        if (! $file) {
             return 'Media not found';
         }
         $file->delete();
@@ -333,10 +339,12 @@ class BuildingController extends Controller
         @unlink(public_path('storage/media') . '/thumbs/' . $file->url);
         @unlink(public_path('storage/media') . '/thumbs/' . $thumb_url);
         @unlink(public_path('storage/media') . '/original/' . $file->url);
+
         return 'Media removed';
     }
 
-    private function building($request){
+    private function building($request)
+    {
         return $data = [
             'title' => $request->title,
             'content' => $request->content,

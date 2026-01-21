@@ -7,7 +7,6 @@ use App\Domains\Auth\Models\User;
 use Database\Seeders\Traits\DisableForeignKeys;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Str;
 
 /**
  * Class UserTableSeeder.
@@ -100,6 +99,7 @@ function generateRandomPhoneNumber(string $countryCode): string
             $areaCode = rand(200, 999);
             $firstPart = rand(200, 999);
             $secondPart = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
+
             return "+1-$areaCode-$firstPart-$secondPart";
         default:
             return '';

@@ -1,6 +1,7 @@
 <?php
 
 // namespace App\Http\Middleware;
+
 namespace App\Domains\Auth\Http\Middleware;
 
 use Closure;

@@ -3,13 +3,14 @@
 namespace Modules\RentalApplication\Entities;
 
 use App\Domains\Auth\Models\User;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 
 class ApplicantScreening extends Model
 {
-    use HasFactory, Notifiable;
+    use HasFactory;
+    use Notifiable;
 
     protected $fillable = ['app_id', 'screened_by', 'question', 'answer', 'answer_guest', 'question_type', 'field_type'];
 

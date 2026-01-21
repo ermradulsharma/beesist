@@ -25,4 +25,3 @@ class RentalApplicationFactory extends Factory
         ];
     }
 }
-

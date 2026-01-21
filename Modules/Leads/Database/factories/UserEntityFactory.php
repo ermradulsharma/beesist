@@ -25,4 +25,3 @@ class UserEntityFactory extends Factory
         ];
     }
 }
-

@@ -3,15 +3,15 @@
 namespace Modules\Tenant\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\HtmlString;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class TenantAccountNotification extends Notification
 {
     use Queueable;
-    public $user, $password;
+    public $user;
+    public $password;
+
     /**
      * Create a new notification instance.
      *
@@ -42,7 +42,7 @@ class TenantAccountNotification extends Notification
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage)->subject('Registration confirmed at ' . config('app.name') . '!')
+        return (new MailMessage())->subject('Registration confirmed at ' . config('app.name') . '!')
             ->greeting('Hello ' . $this->user->first_name . ',')
             ->line('Your account has been created with ' . config('app.name') . '.')
             ->line('You can login with:')

@@ -24,6 +24,7 @@ class TwoFactorAuthentication extends Component
         if ($request->user()->confirmTwoFactorAuth($this->code)) {
             $this->resetErrorBag();
             session()->flash('flash_success', __('Two Factor Authentication Successfully Enabled'));
+
             return redirect()->route('frontend.auth.account.2fa.show');
         }
 

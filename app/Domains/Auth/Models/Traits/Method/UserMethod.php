@@ -55,8 +55,6 @@ trait UserMethod
         return $this->hasRole(config('boilerplate.access.role.tenant'));
     }
 
-
-
     /**
      * @return mixed
      */
@@ -119,6 +117,7 @@ trait UserMethod
     public function getAvatar($size = null): string
     {
         $size = $size ?? config('boilerplate.avatar.size', 80);
+
         return 'https://gravatar.com/avatar/' . md5(strtolower(trim($this->email))) . '?s=' . $size . '&d=mp';
     }
 }

@@ -72,7 +72,7 @@ class HomeController
     {
         $uploads_folder = public_path() . '/uploads';
         $uploads_url = asset('uploads');
-        if (!File::exists($uploads_folder)) {
+        if (! File::exists($uploads_folder)) {
             File::makeDirectory($uploads_folder, 0755, true);
         }
         $fileName = $request->file('file')->getClientOriginalName();

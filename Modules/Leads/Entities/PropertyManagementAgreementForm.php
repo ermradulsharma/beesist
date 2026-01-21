@@ -2,8 +2,8 @@
 
 namespace Modules\Leads\Entities;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class PropertyManagementAgreementForm extends Model
 {
@@ -106,7 +106,7 @@ class PropertyManagementAgreementForm extends Model
         'management_type',
         'pma_pdf',
         'referral',
-        'referral_other'
+        'referral_other',
     ];
 
     protected static function newFactory()

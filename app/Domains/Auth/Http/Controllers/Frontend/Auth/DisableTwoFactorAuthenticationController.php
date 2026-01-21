@@ -23,6 +23,7 @@ class DisableTwoFactorAuthenticationController
     public function destroy(DisableTwoFactorAuthenticationRequest $request)
     {
         $request->user()->disableTwoFactorAuth();
+
         return redirect()->route('frontend.user.account', ['#two-factor-authentication'])->withFlashSuccess(__('Two Factor Authentication Successfully Disabled'));
     }
 }

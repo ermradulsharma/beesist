@@ -2,10 +2,13 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use Carbon\Carbon;
+use Illuminate\Console\Command;
 use Modules\Cms\Entities\EmailTemplate;
 use Modules\Property\Entities\ShowingApplication;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ShowingNotification;
+use App\Notification;
 
 class ShowingSurvey extends Command
 {

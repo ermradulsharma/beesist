@@ -10,6 +10,7 @@ use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 class PageTable extends DataTableComponent
 {
     protected $model = Page::class;
+
     public function configure(): void
     {
         $this->setPrimaryKey('id');
@@ -31,6 +32,7 @@ class PageTable extends DataTableComponent
                 $editButton = '<a href="' . $editUrl . '" data-toggle="tooltip" title="Edit Page" class="btn btn-info btn-sm p-1 mr-1"><i class="fas fa-pen m-0" style="font-size: 11px;"></i></a>';
                 $viewButton = '<a target="_blank" href="' . $viewtUrl . '" data-toggle="tooltip" title="View Page" class="btn btn-success btn-sm p-1 mr-1"><i class="fas fa-eye m-0" style="font-size: 11px;"></i></a>';
                 $deleteButton = '<a href="javascript:void(0)" data-toggle="tooltip" title="Remove Template" wire:confirm="Are You Sure? Want to delete" wire:click="delete(' . $row->id . ')" class="btn btn-danger btn-sm p-1 mr-1"><i class="fas fa-trash m-0" style="font-size: 11px;"></i></a>';
+
                 return '<div class="d-flex align-items-center">' . $editButton . $viewButton . $deleteButton . '</div>';
             })->html(),
             Column::make(__('ID'), 'id')->sortable(),

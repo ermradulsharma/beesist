@@ -3,9 +3,8 @@
 namespace Modules\Leads\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\HtmlString;
 
 class ApplicationNotification extends Notification
@@ -46,7 +45,7 @@ class ApplicationNotification extends Notification
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject($this->subject)
             ->greeting('Hello ' . $this->name  . ',')
             ->line(new HtmlString($this->content))

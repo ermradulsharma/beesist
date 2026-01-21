@@ -3,16 +3,16 @@
 namespace Modules\RentalApplication\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\HtmlString;
 
 class ApplicationVerification extends Notification
 {
     use Queueable;
-    public $userObj, $type, $application_id;
+    public $userObj;
+    public $type;
+    public $application_id;
 
     /**
      * Create a new notification instance.
@@ -43,10 +43,9 @@ class ApplicationVerification extends Notification
      * @param mixed $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
-
     public function toMail($notifiable)
     {
-        $mailMessage = (new MailMessage)->subject($this->userObj['subject'])->greeting('Hello ' . $this->userObj['user_name'] . ',')->line(new HtmlString($this->userObj['msg']));
+        $mailMessage = (new MailMessage())->subject($this->userObj['subject'])->greeting('Hello ' . $this->userObj['user_name'] . ',')->line(new HtmlString($this->userObj['msg']));
         if ($this->userObj['user_address'] != '') {
             $mailMessage->line($this->userObj['user_address']);
         }
@@ -57,9 +56,9 @@ class ApplicationVerification extends Notification
             $mailMessage->action('Give a Review', route('rental_application.screeningRentalApplication', ['type' => $this->type, 'application_id' => encrypt($this->application_id)]));
         }
         $mailMessage->line('If you are unable to provide a reference, please let us know by replying to this email.')->line('Thank you for your cooperation.');
+
         return $mailMessage;
     }
-
 
     /**
      * Get the array representation of the notification.

@@ -3,8 +3,8 @@
 namespace Modules\RentalApplication\Database\Seeders;
 
 use Carbon\Carbon;
-use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Seeder;
 use Modules\RentalApplication\Entities\ScreeningQuestion;
 
 class ScreeningQuestionTableSeeder extends Seeder

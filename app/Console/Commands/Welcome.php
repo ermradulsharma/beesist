@@ -2,12 +2,12 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Notification;
 use Modules\Cms\Entities\EmailTemplate;
 use Modules\Leads\Entities\PropertyManagementAgreementForm;
+use Modules\Leads\Notifications\RentalEvaluationNotification;
 
 class Welcome extends Command
 {

@@ -3,13 +3,13 @@
 namespace Modules\Tenant\Http\Livewire;
 
 use Illuminate\Database\Eloquent\Builder;
-use Rappasoft\LaravelLivewireTables\DataTableComponent;
-use Rappasoft\LaravelLivewireTables\Views\Column;
-use Modules\Tenant\Entities\TenantAgreement;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Modules\Leads\Entities\UserEntity;
 use Modules\Property\Entities\Property;
+use Modules\Tenant\Entities\TenantAgreement;
+use Rappasoft\LaravelLivewireTables\DataTableComponent;
+use Rappasoft\LaravelLivewireTables\Views\Column;
 use Rappasoft\LaravelLivewireTables\Views\Filters\DateRangeFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
@@ -18,10 +18,12 @@ class TenantAgreementTable extends DataTableComponent
 {
     protected $model = TenantAgreement::class;
     public $account_id;
+
     public function mount($account_id = null)
     {
         $this->account_id = $account_id;
     }
+
     public function configure(): void
     {
         $this->setPrimaryKey('id')->setDefaultSort('id', 'DESC')->setFiltersEnabled();
@@ -51,11 +53,11 @@ class TenantAgreementTable extends DataTableComponent
             Column::make('Actions')->label(function ($row, Column $column) {
                 $action = $row->form_step == 4 ? 'edit' : 'view';
                 $formId = Crypt::encryptString($row->id);
-                $accessToken =  $row->access_token;
+                $accessToken = $row->access_token;
 
-                $class = $row->form_step == 4 ?  'primary' : 'info';
-                $title = $row->form_step == 4 ?  'Approve' : 'View';
-                $icon = $row->form_step == 4 ?  'pen' : 'eye';
+                $class = $row->form_step == 4 ? 'primary' : 'info';
+                $title = $row->form_step == 4 ? 'Approve' : 'View';
+                $icon = $row->form_step == 4 ? 'pen' : 'eye';
 
                 $editButton = '';
                 $rejectButton = '';
@@ -90,6 +92,7 @@ class TenantAgreementTable extends DataTableComponent
                 if ($row->form_step == 5 && $row->status == 1) {
                     $buttons .= $agreementButton . $disclosureButton;
                 }
+
                 return '<div class="d-flex align-items-center">' . $buttons . '</div>';
             })->html(),
             Auth::user()->hasRole('Property Manager') ? Column::make(__('Assign To'), 'property.agentDetail.name')->searchable() : Column::make(__('Managed By'))->label(function ($row) {
@@ -108,6 +111,7 @@ class TenantAgreementTable extends DataTableComponent
             })->sortable(),
             Column::make("Status", "status")->format(function ($value) {
                 return '<i class="text-' . ($value == 0 ? 'warning' : ($value == 1 ? 'success' : 'danger')) . ' fas fa-circle" style="font-size: 10px;" data-toggle="tooltip" title="' . ($value == 0 ? 'Pendding' : ($value == 1 ? 'Approved' : 'Declined')) . '"></i>';
+
                 return "<span class='badge badge-" . ($value == 0 ? 'warning' : ($value == 1 ? 'success' : 'danger')) . "'>" . ($value == 0 ? 'Pendding' : ($value == 1 ? 'Approved' : 'Declined')) . "</span>";
             })->sortable()->collapseOnTablet()->html(),
         ];
@@ -168,15 +172,18 @@ class TenantAgreementTable extends DataTableComponent
             if ($this->account_id && $user->hasManagerAccess()) {
                 $query->where('account_id', $this->account_id);
                 $entityIds = $query->pluck('entity_value');
+
                 return $this->model::whereIn('prop_id', $entityIds);
             }
             if ($user->hasRole('Property Owner')) {
                 $entityIds = $query->pluck('entity_value');
                 $propertyIds = Property::whereIn('id', $entityIds)->whereIn('user_id', [$user->id])->pluck('id');
+
                 return $this->model::whereIn('prop_id', $propertyIds);
             } elseif ($user->hasRole('Agent')) {
                 $entityIds = $query->pluck('entity_value');
                 $propertyIds = Property::whereIn('id', $entityIds)->whereIn('prop_agents', [$user->id])->pluck('id');
+
                 return $this->model::whereIn('prop_id', $propertyIds);
             }
         }

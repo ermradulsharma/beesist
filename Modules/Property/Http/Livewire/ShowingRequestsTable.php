@@ -110,12 +110,15 @@ class ShowingRequestsTable extends DataTableComponent
                 switch ($row->status) {
                     case '1':
                         $buttons = $commentButton . $rejectButton . $deleteButton;
+
                         break;
                     case '2':
                         $buttons = $commentButton . $approveButton . $deleteButton;
+
                         break;
                     default:
                         $buttons = $commentButton . $approveButton . $rejectButton . $deleteButton;
+
                         break;
                 }
 

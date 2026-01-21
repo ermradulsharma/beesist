@@ -18,7 +18,8 @@ class SubscriptionTable extends DataTableComponent
 
     public function configure(): void
     {
-        $this->setPrimaryKey('id')->setDefaultSort('id', 'DESC');;
+        $this->setPrimaryKey('id')->setDefaultSort('id', 'DESC');
+        ;
     }
 
     public function columns(): array
@@ -37,6 +38,7 @@ class SubscriptionTable extends DataTableComponent
             DateColumn::make('Created At', 'created_at')->inputFormat('Y-m-d H:i:s')->outputFormat('M j, Y'),
             Column::make(__('Actions'))->label(function ($row) {
                 $user = User::find($row->user_id);
+
                 return view('backend.includes.partials.subscriberActions', ['user' => $user]);
             }),
         ];

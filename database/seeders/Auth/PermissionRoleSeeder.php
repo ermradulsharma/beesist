@@ -51,7 +51,7 @@ class PermissionRoleSeeder extends Seeder
             ['name' => 'user.access.user.reactivate', 'description' => 'Reactivate Users'],
             ['name' => 'user.access.user.clear-session', 'description' => 'Clear User Sessions'],
             ['name' => 'user.access.user.impersonate', 'description' => 'Impersonate Users'],
-            ['name' => 'user.access.user.change-password', 'description' => 'Change User Passwords']
+            ['name' => 'user.access.user.change-password', 'description' => 'Change User Passwords'],
         ];
         $user = Permission::create([
             'type' => User::TYPE_USER,
@@ -76,7 +76,7 @@ class PermissionRoleSeeder extends Seeder
             ['name' => 'user.access.property.edit', 'description' => 'Edit Property'],
             ['name' => 'user.access.property.update', 'description' => 'Update Property'],
             ['name' => 'user.access.property.delete', 'description' => 'Delete Property'],
-            ['name' => 'user.access.property.view', 'description' => 'View Property']
+            ['name' => 'user.access.property.view', 'description' => 'View Property'],
         ];
         $property = Permission::create([
             'type' => User::TYPE_USER,
@@ -101,7 +101,7 @@ class PermissionRoleSeeder extends Seeder
             ['name' => 'user.access.building.edit', 'description' => 'Edit Building'],
             ['name' => 'user.access.building.update', 'description' => 'Update Building'],
             ['name' => 'user.access.building.delete', 'description' => 'Delete Building'],
-            ['name' => 'user.access.building.view', 'description' => 'View Building']
+            ['name' => 'user.access.building.view', 'description' => 'View Building'],
         ];
         $building = Permission::create([
             'type' => User::TYPE_USER,
@@ -198,7 +198,7 @@ class PermissionRoleSeeder extends Seeder
             ['name' => 'user.access.rental.screening.create', 'description' => 'Create Rental Application Screening Question'],
             ['name' => 'user.access.rental.screening.edit', 'description' => 'Edit Rental Application Screening Question'],
             ['name' => 'user.access.rental.screening.view', 'description' => 'View Rental Application Screening Question'],
-            ['name' => 'user.access.rental.screening.delete', 'description' => 'Delete Rental Application Screening Question']
+            ['name' => 'user.access.rental.screening.delete', 'description' => 'Delete Rental Application Screening Question'],
         ];
         $application = Permission::create([
             'type' => User::TYPE_USER,

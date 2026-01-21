@@ -7,28 +7,28 @@ use App\Domains\Auth\Services\UserService;
 use App\Notifications\WelcomeEmailNotification;
 use Carbon\Carbon;
 use Exception;
-use PDF;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Validator;
-use Modules\Property\Entities\Property;
-use Modules\Tenant\Entities\TenantAgreement;
-use Modules\Tenant\Rules\TenantRequest;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Modules\Leads\Entities\UserEntity;
+use Modules\Property\Entities\Property;
 use Modules\RentalApplication\Entities\RentalApplication;
-use Modules\Tenant\Notifications\TenantAccountNotification;
+use Modules\Tenant\Entities\TenantAgreement;
 use Modules\Tenant\Notifications\TenantAgreementNotification;
+use Modules\Tenant\Rules\TenantRequest;
+use PDF;
 use Str;
 use ZipArchive;
 
 class TenantAgreementController extends Controller
 {
     protected $userService;
+
     public function __construct(UserService $userService)
     {
         $this->userService = $userService;
@@ -38,6 +38,7 @@ class TenantAgreementController extends Controller
     {
         return $this->userService->registerUser($data);
     }
+
     /**
      * Display a listing of the resource.
      * @return Renderable
@@ -65,10 +66,10 @@ class TenantAgreementController extends Controller
     {
         // return $request->all();
         $onetenant = ['tenants_data', 'adult_names', 'minor_names', 'property_address', 'utilities', 'warrant', 'form_k_notice', 'rental_period', 'security', 'initial_1', 'initial_5', 'initial_9', 'initial_12', 'initial_15', 'initial_19', 'initial_23', 'initial_25', 'initial_27', 'initial_28', 'initial_29'];
-        $twotenants = array('tenants_data', 'initial_1', 'initial_2', 'initial_5', 'initial_6', 'initial_9', 'initial_10', 'initial_12', 'initial_13', 'initial_15', 'initial_16', 'initial_19', 'initial_20', 'initial_23', 'initial_24', 'initial_25', 'initial_26', 'initial_27', 'initial_28', 'initial_29', 'property_address', 'utilities', 'warrant', 'form_k_notice', 'security');
-        $threetenants = array('tenants_data', 'initial_1', 'initial_2', 'initial_3', 'initial_5', 'initial_6', 'initial_7', 'initial_9', 'initial_10', 'initial_11', 'initial_12', 'initial_13', 'initial_14', 'initial_15', 'initial_16', 'initial_17', 'initial_19', 'initial_20', 'initial_21', 'initial_23', 'initial_24', 'initial_25', 'initial_26', 'initial_27', 'initial_28', 'initial_29', 'property_address', 'utilities', 'warrant', 'form_k_notice', 'security');
+        $twotenants = ['tenants_data', 'initial_1', 'initial_2', 'initial_5', 'initial_6', 'initial_9', 'initial_10', 'initial_12', 'initial_13', 'initial_15', 'initial_16', 'initial_19', 'initial_20', 'initial_23', 'initial_24', 'initial_25', 'initial_26', 'initial_27', 'initial_28', 'initial_29', 'property_address', 'utilities', 'warrant', 'form_k_notice', 'security'];
+        $threetenants = ['tenants_data', 'initial_1', 'initial_2', 'initial_3', 'initial_5', 'initial_6', 'initial_7', 'initial_9', 'initial_10', 'initial_11', 'initial_12', 'initial_13', 'initial_14', 'initial_15', 'initial_16', 'initial_17', 'initial_19', 'initial_20', 'initial_21', 'initial_23', 'initial_24', 'initial_25', 'initial_26', 'initial_27', 'initial_28', 'initial_29', 'property_address', 'utilities', 'warrant', 'form_k_notice', 'security'];
         $json_fields = ['disclosure', 'tenants_data', 'adult_names', 'minor_names', 'property_address', 'utilities', 'rental_period', 'rent_fees', 'security', 'smoking', 'form_k_notice', 'tenant_property', 'charges', 'account_details', 'other_account_holder', 'initial_17', 'initial_18', 'initial_19', 'initial_20', 'initial_22', 'initial_23', 'initial_24', 'initial_25', 'initial_25', 'initial_29'];
-        $rules = array();
+        $rules = [];
         if ($request->form_step == '0') {
             if ($request->number_tenants == 1) {
                 foreach ($onetenant as $key) {
@@ -171,12 +172,13 @@ class TenantAgreementController extends Controller
             }
             $validator = Validator::make($request->all(), $rules);
             if ($validator->fails()) {
-                return back()->withErrors($validator)->withInput();;
+                return back()->withErrors($validator)->withInput();
+                ;
                 // return response()->json(['errors' => $validator->errors()], 422);
             }
             foreach ($request->all() as $key => $val) {
                 if (in_array($key, $json_fields)) {
-                    $tableArray[$key] = (!empty($val) ? serialize(json_encode($val)) : NULL);
+                    $tableArray[$key] = (! empty($val) ? serialize(json_encode($val)) : null);
                 } else {
                     $tableArray[$key] = $val;
                 }
@@ -187,7 +189,7 @@ class TenantAgreementController extends Controller
                 $userexist = User::where('email', $request->tenants_data['t1_email'])->first();
                 if ($userexist) {
                     $checkRole = $userexist->hasRole('Tenant');
-                    if (!$checkRole) {
+                    if (! $checkRole) {
                         $userexist->syncRoles(['Tenant']);
                     }
                     $user_id = $userexist->id;
@@ -202,7 +204,7 @@ class TenantAgreementController extends Controller
                         'country' => $request->country ?? 'CA',
                         'type' => User::TYPE_USER,
                         'roles' => 'Tenant',
-                        'password' => bcrypt($password)
+                        'password' => bcrypt($password),
                     ];
                     $createUser = $this->createUser($userData);
                     if (Auth::check()) {
@@ -228,7 +230,7 @@ class TenantAgreementController extends Controller
                     $tenantData = json_decode(unserialize($data->tenants_data), true);
                     $firstName = isset($tenantData['t1_fname']) ? $tenantData['t1_fname'] : '';
 
-                    $content  = 'We hope this message finds you well. Please take a moment to review and sign your Tenancy Agreement. Your prompt action on this matter is greatly appreciated.';
+                    $content = 'We hope this message finds you well. Please take a moment to review and sign your Tenancy Agreement. Your prompt action on this matter is greatly appreciated.';
                     $content .= 'To sign the agreement, please click the link below:';
                     $content .= '<a href="' . route('tenant.viewTenantAgreement', ['action' => 'edit', 'form_id' => Crypt::encryptString($tenancy->id), 'access_token' => $tenancy->access_token]) . '"> Click Here </a>';
                     $content .= 'If you have any questions or concerns, feel free to contact us.';
@@ -241,21 +243,22 @@ class TenantAgreementController extends Controller
                 $propertyObj = Property::find($tenancy->prop_id);
                 $this->sendNotification($propertyObj, $tenancy->id, $tenancy->access_token);
             }
+
             return redirect()->route('tenant.viewTenantAgreement', ['action' => 'view', 'form_id' => Crypt::encryptString($tenancy->id), 'access_token' => $tenancy->access_token])->with('status', 'Submitted Successfully!');
-        } elseif ($request->form_step == '1' && !empty($request->id)) {
+        } elseif ($request->form_step == '1' && ! empty($request->id)) {
             $rules = [
                 'other_account_holder.*' => ['required', new TenantRequest()],
-                'account_details.*'      => ['required', new TenantRequest()],
-                'initial_1'              => ['required', new TenantRequest()],
-                'initial_5'              => ['required', new TenantRequest()],
-                'initial_17.*'           => ['required', new TenantRequest()], // Adjusted for array handling
-                'initial_21.*'           => ['required', new TenantRequest()],
-                'initial_22.*'           => ['required', new TenantRequest()],
-                'initial_23.*'           => ['required', new TenantRequest()],
-                'initial_27'             => ['required', new TenantRequest()],
-                'initial_29.*'           => ['required', new TenantRequest()],
+                'account_details.*' => ['required', new TenantRequest()],
+                'initial_1' => ['required', new TenantRequest()],
+                'initial_5' => ['required', new TenantRequest()],
+                'initial_17.*' => ['required', new TenantRequest()], // Adjusted for array handling
+                'initial_21.*' => ['required', new TenantRequest()],
+                'initial_22.*' => ['required', new TenantRequest()],
+                'initial_23.*' => ['required', new TenantRequest()],
+                'initial_27' => ['required', new TenantRequest()],
+                'initial_29.*' => ['required', new TenantRequest()],
                 // 'voided_check'           => ['required', new TenantRequest()],
-                'disclaimer'             => ['required', new TenantRequest()],
+                'disclaimer' => ['required', new TenantRequest()],
 
             ];
             if ($request->insurance == 'Yes') {
@@ -285,7 +288,7 @@ class TenantAgreementController extends Controller
             $tableArray = [];
             foreach ($requestData as $key => $val) {
                 if (in_array($key, $json_fields)) {
-                    $tableArray[$key] = (!empty($val) ? serialize(json_encode($val)) : null);
+                    $tableArray[$key] = (! empty($val) ? serialize(json_encode($val)) : null);
                 } else {
                     $tableArray[$key] = $val;
                 }
@@ -307,7 +310,7 @@ class TenantAgreementController extends Controller
                 foreach (['voided_check', 'ins_policy'] as $fileKey) {
                     if ($request->hasFile($fileKey)) {
                         $typeDir = $baseDir . ($fileKey == 'voided_check' ? 'check/' : 'policy/');
-                        if (!File::isDirectory($typeDir)) {
+                        if (! File::isDirectory($typeDir)) {
                             File::makeDirectory($typeDir, 0777, true, true);
                         }
                         $filename = time() . '-' . str_replace(" ", "-", $request->file($fileKey)->getClientOriginalName());
@@ -329,7 +332,7 @@ class TenantAgreementController extends Controller
                 }
                 $updateForm->form_step = $updateForm->number_tenants == '1' ? '4' : '2';
                 if ($data->prop_type == 'Strata' && isset($request->form_k_notice)) {
-                    $updateForm->form_k_notice = !empty($request->form_k_notice) ? serialize(json_encode($request->form_k_notice)) : null;
+                    $updateForm->form_k_notice = ! empty($request->form_k_notice) ? serialize(json_encode($request->form_k_notice)) : null;
                 }
                 $updateForm->save();
             }
@@ -343,13 +346,13 @@ class TenantAgreementController extends Controller
                 //FIRST TENANT EMAIL
                 $tenant = getUserById($updateForm->user_id);
                 $subject = appName() . ' Tenancy Agreement';
-                $content  = 'We hope this message finds you well. Please take a moment to review and sign your Tenancy Agreement. Your prompt action on this matter is greatly appreciated.';
+                $content = 'We hope this message finds you well. Please take a moment to review and sign your Tenancy Agreement. Your prompt action on this matter is greatly appreciated.';
                 $content .= 'To sign the agreement, please click the link below:';
                 $content .= '<a href="' . route('tenant.viewTenantAgreement', ['action' => 'edit', 'form_id' => Crypt::encryptString($data->id), 'access_token' => $updateForm->access_token]) . '"> Click Here </a>';
                 $content .= 'If you have any questions or concerns, feel free to contact us.';
 
                 $firstName = $tenants_data['t2_fname'];
-                if (!$tenant) {
+                if (! $tenant) {
                     $tenant = new User();
                     $tenant->email = $tenants_data['t2_email'];
                 }
@@ -360,8 +363,9 @@ class TenantAgreementController extends Controller
                 $propertyObj = Property::find($updateForm->prop_id);
                 $this->sendNotification($propertyObj, $updateForm->id, $updateForm->access_token);
             }
+
             return redirect()->route('tenant.viewTenantAgreement', ['action' => 'view', 'form_id' => Crypt::encryptString($updateForm->id), 'access_token' => $updateForm->access_token])->with('status', 'Submitted Successfully!');
-        } elseif ($request->form_step == '2' && !empty($request->id)) {
+        } elseif ($request->form_step == '2' && ! empty($request->id)) {
             // return $request->all();
             $rules = [
                 'initial_2' => ['required', new TenantRequest()],
@@ -382,7 +386,7 @@ class TenantAgreementController extends Controller
             $tableArray = [];
             foreach ($requestData as $key => $val) {
                 if (in_array($key, $json_fields)) {
-                    $tableArray[$key] = (!empty($val) ? serialize(json_encode($val)) : null);
+                    $tableArray[$key] = (! empty($val) ? serialize(json_encode($val)) : null);
                 } else {
                     $tableArray[$key] = $val;
                 }
@@ -412,13 +416,13 @@ class TenantAgreementController extends Controller
 
                 // Notification E-mail Body
                 $subject = appName() . ' - New Tenancy Agreement';
-                $content  = 'We hope this message finds you well. Please take a moment to review and sign your Tenancy Agreement. Your prompt action on this matter is greatly appreciated.';
+                $content = 'We hope this message finds you well. Please take a moment to review and sign your Tenancy Agreement. Your prompt action on this matter is greatly appreciated.';
                 $content .= 'To sign the agreement, please click the link below:';
                 $content .= '<a href="' . route('tenant.viewTenantAgreement', ['action' => 'edit', 'form_id' => Crypt::encryptString($data->id), 'access_token' => $updateForm->access_token]) . '"> Click Here </a>';
                 $content .= 'If you have any questions or concerns, feel free to contact us.';
 
                 $firstName = $tenants_data['t3_fname'];
-                if (!$tenant) {
+                if (! $tenant) {
                     $tenant = new User();
                     $tenant->email = $tenants_data['t3_email'];
                 }
@@ -429,8 +433,9 @@ class TenantAgreementController extends Controller
                 $propertyObj = Property::find($updateForm->prop_id);
                 $this->sendNotification($propertyObj, $updateForm->id, $updateForm->access_token);
             }
+
             return redirect()->route('tenant.viewTenantAgreement', ['action' => 'view', 'form_id' => Crypt::encryptString($data->id), 'access_token' => $data->access_token])->with('status', 'Submitted Successfully!');
-        } elseif ($request->form_step == '3' && !empty($request->id)) {
+        } elseif ($request->form_step == '3' && ! empty($request->id)) {
             $rules = [
                 'initial_3' => ['required', new TenantRequest()],
                 'initial_7' => ['required', new TenantRequest()],
@@ -450,7 +455,7 @@ class TenantAgreementController extends Controller
             $tableArray = [];
             foreach ($requestData as $key => $val) {
                 if (in_array($key, $json_fields)) {
-                    $tableArray[$key] = (!empty($val) ? serialize(json_encode($val)) : null);
+                    $tableArray[$key] = (! empty($val) ? serialize(json_encode($val)) : null);
                 } else {
                     $tableArray[$key] = $val;
                 }
@@ -475,8 +480,9 @@ class TenantAgreementController extends Controller
 
             $propertyObj = Property::find($updateForm->prop_id);
             $this->sendNotification($propertyObj, $updateForm->id, $updateForm->access_token);
+
             return redirect()->route('tenant.viewTenantAgreement', ['action' => 'view', 'form_id' => Crypt::encryptString($data->id), 'access_token' => $data->access_token])->with('status', 'Submitted Successfully!');
-        } elseif ($request->form_step == '4' && !empty($request->id)) {
+        } elseif ($request->form_step == '4' && ! empty($request->id)) {
             $rules = [
                 'initial_4' => ['required', new TenantRequest()],
                 'initial_8' => ['required', new TenantRequest()],
@@ -496,7 +502,7 @@ class TenantAgreementController extends Controller
             $tableArray = [];
             foreach ($requestData as $key => $val) {
                 if (in_array($key, $json_fields)) {
-                    $tableArray[$key] = (!empty($val) ? serialize(json_encode($val)) : null);
+                    $tableArray[$key] = (! empty($val) ? serialize(json_encode($val)) : null);
                 } else {
                     $tableArray[$key] = $val;
                 }
@@ -521,7 +527,7 @@ class TenantAgreementController extends Controller
             $baseDir = createBaseDirectory($type, $request->id);
             $savePath = $baseDir . 'forrentcentral-TA-' . $file_name . '.pdf';
 
-            if (!file_exists($savePath)) {
+            if (! file_exists($savePath)) {
                 ini_set('max_execution_time', 0);
                 $pdf = PDF::loadView('tenant::agreement.agreementsView', compact('countries', 'data'));
                 $pdf->getDomPDF()->set_option("enable_php", true);
@@ -551,24 +557,23 @@ class TenantAgreementController extends Controller
                     "t{$i}_fname" => $tenants_data["t{$i}_fname"],
                     "t{$i}_lname" => $tenants_data["t{$i}_lname"],
                     "t{$i}_email" => $tenants_data["t{$i}_email"],
-                    "t{$i}_phone" => $tenants_data["t{$i}_phone"]
+                    "t{$i}_phone" => $tenants_data["t{$i}_phone"],
                 ];
             }
             foreach ($tenantData as $key => $tenant) {
                 $tenantName = $tenant['t' . (intval($key) + 1) . '_fname'];
                 $tenantEmail = $tenant['t' . (intval($key) + 1) . '_email'];
                 $userObj = User::where('email', $tenantEmail)->first();
-                if (!$userObj) {
+                if (! $userObj) {
                     $userObj = new User();
                     $userObj->email = $tenant['t' . (intval($key) + 1) . '_email'];
                 }
                 $userObj->notify(new TenantAgreementNotification($content, $subject, $tenantName, $ccEmails, $attachment));
             }
+
             return redirect()->route('tenant.viewTenantAgreement', ['action' => 'view', 'form_id' => Crypt::encryptString($data->id), 'access_token' => $updateForm->access_token])->with('status', 'Submitted Successfully!');
         }
     }
-
-    
 
     // Send Notification to the Manager, Owner, and Agents
     private function sendNotification($propertyObj, $id, $token)
@@ -583,6 +588,7 @@ class TenantAgreementController extends Controller
 
         // Notifying the property manager
         $managerObj = User::find($accountObj->account_id);
+
         try {
             $managerObj->notify(new TenantAgreementNotification($content, $subject, $managerObj->name, $ccEmails, $attachment));
             Log::info('Notifying the property manager');
@@ -596,6 +602,7 @@ class TenantAgreementController extends Controller
             if (count($agentIds) > 0) {
                 foreach ($agentIds as $key => $agentId) {
                     $agentObj = User::find($agentId);
+
                     try {
                         $agentObj->notify(new TenantAgreementNotification($content, $subject, $agentObj->name, $ccEmails, $attachment));
                         Log::info('Notifying to property agent: ' . $agentObj->name);
@@ -612,6 +619,7 @@ class TenantAgreementController extends Controller
             $ownerId = $propertyObj->user_id;
             if ($accountObj->account_id != $ownerId) {
                 $ownerObj = User::find($ownerId);
+
                 try {
                     $ownerObj->notify(new TenantAgreementNotification($content, $subject, $ownerObj->name, $ccEmails, $attachment));
                     Log::info('Notifying property owner if not the same as the manager: ' . $ownerObj->name);
@@ -663,7 +671,7 @@ class TenantAgreementController extends Controller
         //
     }
 
-    public function agreementForm(Request $request, $user_id = NULL, $prop_id = NULL, $tenants = NULL, $app_id = NULL)
+    public function agreementForm(Request $request, $user_id = null, $prop_id = null, $tenants = null, $app_id = null)
     {
         $formId = $request->query('form_id');
         $rentalApplicationData = null;
@@ -702,13 +710,13 @@ class TenantAgreementController extends Controller
         return view('tenant::agreement.agreementForm', compact('title', 'disclosure', 'tenants_data', 'property_address', 'rentalApplicationData', 'desc', 'countries', 'data', 'property', 'properties', 'ip', 'tenants', 'user', 'access_token', 'app_id', 'minor_tenants', 'adult_tenants', 'prop_type'));
     }
 
-
     public function viewTenantAgreement(Request $request, $action, $form_id, $access_token)
     {
         try {
             $data = TenantAgreement::where(['id' => Crypt::decryptString($form_id), 'access_token' => $access_token])->first();
-            if (!$data) {
+            if (! $data) {
                 $link_accessible = false;
+
                 return view('tenant::agreement.expireLinkPage', compact('link_accessible'));
             }
             $countries = Countries();
@@ -780,11 +788,13 @@ class TenantAgreementController extends Controller
                 $link_accessible = true;
                 $user = User::find($data->user_id);
             }
+
             return view('tenant::agreement.agreementForm', compact('countries', 'data', 'link_accessible', 'tenants', 'action', 'user', 'properties', 'property', 'minor_tenants', 'adult_tenants', 'initial_1', 'initial_2', 'initial_3', 'initial_4', 'initial_5', 'initial_6', 'initial_7', 'initial_8', 'initial_9', 'initial_10', 'initial_11', 'initial_12', 'initial_13', 'initial_14', 'initial_15', 'initial_16', 'initial_17', 'initial_18', 'initial_19', 'initial_20', 'initial_21', 'initial_22', 'initial_23', 'initial_24', 'initial_25', 'initial_26', 'initial_27', 'initial_28', 'initial_29', 'initial_30', 'disclosure', 'tenants_data', 'minor_names', 'adult_names', 'property_address', 'utilities', 'rental_period', 'rent_fees', 'charges', 'security', 'smoking', 'form_k_notice', 'tenant_property', 'account_details', 'other_account_holder'));
         } catch (Exception $e) {
             $errorMessage = $e->getMessage();
             $lineNumber = $e->getLine();
             Log::error("Error in viewTenantAgreement at line $lineNumber: $errorMessage");
+
             return redirect()->back();
         }
     }
@@ -792,6 +802,7 @@ class TenantAgreementController extends Controller
     public function saveSign(Request $request)
     {
         $file = base64_encode($request->input('jsonbucket'));
+
         return base64_decode($file);
     }
 
@@ -799,6 +810,7 @@ class TenantAgreementController extends Controller
     {
         // return $request->query('action');
         ini_set('max_execution_time', 0);
+
         try {
             $data = TenantAgreement::where('id', Crypt::decryptString($id))->where('access_token', $access_key)->first();
             $countries = Countries();
@@ -806,7 +818,7 @@ class TenantAgreementController extends Controller
             $fileName = str_slug($tenants_data['t1_fname'] . ' ' . $tenants_data['t1_lname'] . ' ' . $data->id, "-");
 
             $baseDir = public_path('uploads/agreements/' . $data->id . '/');
-            if (!File::isDirectory($baseDir)) {
+            if (! File::isDirectory($baseDir)) {
                 File::makeDirectory($baseDir, 0777, true, true);
             }
 
@@ -819,7 +831,7 @@ class TenantAgreementController extends Controller
             // Create a ZIP file if it doesn't exist
             $zip = new ZipArchive();
 
-            if (!file_exists($zipPath) && $zip->open($zipPath, ZipArchive::CREATE) === TRUE) {
+            if (! file_exists($zipPath) && $zip->open($zipPath, ZipArchive::CREATE) === true) {
                 $pdf = PDF::loadView('tenant::agreement.agreementsView', compact('countries', 'data'));
                 $pdf->getDomPDF()->set_option("enable_php", true);
                 $pdf->save($agreementFilePath);
@@ -842,17 +854,19 @@ class TenantAgreementController extends Controller
                 }
             } elseif ($type == 'disclosure') {
                 return $data;
-                if (!file_exists($disclosureFilePath)) {
+                if (! file_exists($disclosureFilePath)) {
                     $pdf = PDF::stream('tenant::agreement.agreementDisclosure', compact('countries', 'data'));
                     $pdf->getDomPDF()->set_option("enable_php", true);
                     $pdf->save($disclosureFilePath);
                 }
+
                 return response()->download($disclosureFilePath);
             }
 
             return response()->json(['error' => 'Invalid PDF type.'], 400);
         } catch (\Exception $e) {
             Log::error('Message ' . $e->getMessage() . ' Line No: ' . $e->getLine() . ' File Name ' . $e->getFile());
+
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }

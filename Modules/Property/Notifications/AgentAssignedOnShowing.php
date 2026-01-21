@@ -11,8 +11,9 @@ use Modules\Property\Entities\PropertyShowing;
 class AgentAssignedOnShowing extends Notification
 {
     use Queueable;
-    public $showing, $message, $subject;
-
+    public $showing;
+    public $message;
+    public $subject;
 
     /**
      * Create a new notification instance.
@@ -48,7 +49,8 @@ class AgentAssignedOnShowing extends Notification
         $agentName = optional($this->showing->agent)->first_name ?? 'Agent';
         $subject = $this->subject ?? 'Default Subject';
         $greeting = 'Hello ' . $agentName;
-        return (new MailMessage)->subject($subject)->greeting($greeting)->line(new HtmlString($this->message));
+
+        return (new MailMessage())->subject($subject)->greeting($greeting)->line(new HtmlString($this->message));
     }
 
     /**

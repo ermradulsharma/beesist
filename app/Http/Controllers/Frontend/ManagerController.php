@@ -6,13 +6,13 @@ use App\Domains\Auth\Models\User;
 use App\Models\RentalEvaluation;
 use App\Models\Setting;
 use Auth;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use Modules\Cms\Entities\EmailTemplate;
 use Modules\Leads\Entities\UserEntity;
 use Modules\Leads\Notifications\RentalEvaluationNotification;
 use Modules\Property\Entities\Property;
-use Carbon\Carbon;
 
 class ManagerController
 {

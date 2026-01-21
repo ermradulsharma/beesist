@@ -21,6 +21,7 @@ class LocaleMiddleware
         if (config('boilerplate.locale.status') && session()->has('locale')) {
             setAllLocale(session()->get('locale'));
         }
+
         return $next($request);
     }
 }

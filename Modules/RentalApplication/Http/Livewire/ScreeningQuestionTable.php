@@ -19,12 +19,14 @@ class ScreeningQuestionTable extends DataTableComponent
     public $field_type;
     public $status;
     public $account_id;
+
     public function mount($account_id = null)
     {
         $this->account_id = $account_id;
     }
 
     public $confirming = null;
+
     public function confirmDelete($id)
     {
         $this->confirming = $id;
@@ -93,7 +95,7 @@ class ScreeningQuestionTable extends DataTableComponent
             }),
         ];
     }
-    
+
     public function columns(): array
     {
         $columns = [
@@ -119,6 +121,7 @@ class ScreeningQuestionTable extends DataTableComponent
                 if (Auth::user()->can('user.access.rental.screening.delete')) {
                     $deleteButton = '<a href="javascript:void(0)" data-toggle="tooltip" title="Remove Question" wire:confirm="Are You Sure? Want to remove question" wire:click="delete(' . $row->id . ')" class="btn btn-danger btn-sm p-1 mr-1""><i class="fas fa-trash m-0" style="font-size: 11px;"></i></a>';
                 }
+
                 return '<div class="d-flex">' . $editButton . $deleteButton . '</div>';
             })->html();
         }
@@ -134,7 +137,7 @@ class ScreeningQuestionTable extends DataTableComponent
     public function builder(): Builder
     {
         $query = ScreeningQuestion::query()->whereNull('pm_id');
-        if ($this->account_id && !Auth::user()->hasAllAccess()) {
+        if ($this->account_id && ! Auth::user()->hasAllAccess()) {
             $query->orWhere('pm_id', $this->account_id);
         }
 

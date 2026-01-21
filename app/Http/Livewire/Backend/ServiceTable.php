@@ -38,6 +38,7 @@ class ServiceTable extends DataTableComponent
                 $editUrl = route('admin.subscription.services.edit', $row->id);
                 $editButton = '<a href="' . $editUrl . '" data-toggle="tooltip" title="Edit Service" class="btn btn-info btn-sm p-1 mr-1"><i class="fas fa-pen m-0" style="font-size: 11px;"></i></a>';
                 $deleteButton = '<a href="javascript:void(0)" data-toggle="tooltip" title="Remove Service" wire:confirm="Are You Sure? Want to delete" wire:click="delete(' . $row->id . ')" class="btn btn-danger btn-sm p-1 mr-1"><i class="fas fa-trash m-0" style="font-size: 11px;"></i></a>';
+
                 return '<div class="d-flex align-items-center">' . $editButton . $deleteButton . '</div>';
             })->html(),
         ];

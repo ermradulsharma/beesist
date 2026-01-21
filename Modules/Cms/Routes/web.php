@@ -18,7 +18,7 @@ use Tabuna\Breadcrumbs\Trail;
 |
 */
 
-if (!function_exists('cmsRoutes')) {
+if (! function_exists('cmsRoutes')) {
     function cmsRoutes($role)
     {
         Route::group(['prefix' => 'page', 'as' => 'page.'], function () use ($role) {

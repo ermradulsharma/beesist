@@ -11,7 +11,10 @@ use Modules\Property\Entities\ShowingApplication;
 class AgentShowing extends Notification
 {
     use Queueable;
-    public $showing, $message, $subject;
+    public $showing;
+    public $message;
+    public $subject;
+
     /**
      * Create a new notification instance.
      *
@@ -49,7 +52,8 @@ class AgentShowing extends Notification
         } else {
             $greeting .= ' Agent';
         }
-        return (new MailMessage)->subject($this->subject)->greeting($greeting)->line(new HtmlString($this->message));
+
+        return (new MailMessage())->subject($this->subject)->greeting($greeting)->line(new HtmlString($this->message));
     }
 
     /**

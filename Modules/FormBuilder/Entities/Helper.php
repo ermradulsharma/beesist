@@ -18,7 +18,7 @@ class Helper
         try {
             $provider = config('formbuilder.roles_provider');
 
-            return (new $provider)();
+            return (new $provider())();
         } catch (Throwable $e) {
             info($e);
 

@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Lab404\Impersonate\Models\Impersonate;
 use Laragear\TwoFactor\Contracts\TwoFactorAuthenticatable;
 use Laragear\TwoFactor\TwoFactorAuthentication;
@@ -25,7 +26,6 @@ use Laravel\Sanctum\HasApiTokens;
 use Modules\Leads\Entities\UserEntity;
 use Modules\Property\Entities\Property;
 use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Support\Str;
 
 /**
  * Class User.
@@ -40,22 +40,22 @@ use Illuminate\Support\Str;
  */
 class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenticatable
 {
-    use Billable,
-        HasApiTokens,
-        HasFactory,
-        HasRoles,
-        Impersonate,
-        MustVerifyEmailTrait,
-        Notifiable,
-        SoftDeletes,
-        TwoFactorAuthentication,
-        UserAttribute,
-        UserMethod,
-        UserRelationship,
-        UserScope;
+    use Billable;
+    use HasApiTokens;
+    use HasFactory;
+    use HasRoles;
+    use Impersonate;
+    use MustVerifyEmailTrait;
+    use Notifiable;
+    use SoftDeletes;
+    use TwoFactorAuthentication;
+    use UserAttribute;
+    use UserMethod;
+    use UserRelationship;
+    use UserScope;
 
-    public const TYPE_ADMIN   = 'admin';
-    public const TYPE_USER    = 'user';
+    public const TYPE_ADMIN = 'admin';
+    public const TYPE_USER = 'user';
     /**
      * The attributes that are mass assignable.
      *
@@ -176,6 +176,7 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
             }
         });
     }
+
     /**
      * Send the password reset notification.
      *
@@ -191,7 +192,7 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
      */
     public function sendEmailVerificationNotification(): void
     {
-        $this->notify(new VerifyEmail);
+        $this->notify(new VerifyEmail());
     }
 
     /**
@@ -209,6 +210,7 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
         if ($this->hasAgentAccess()) {
             return $this->can('user.access.user.impersonate');
         }
+
         return false;
     }
 
@@ -226,14 +228,15 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
         }
 
         if ($user->hasManagerAccess()) {
-            return !$this->isManager();
+            return ! $this->isManager();
         }
         if ($user->hasAllAccess()) {
-            return !$this->isMasterAdmin();
+            return ! $this->isMasterAdmin();
         }
         if ($user->hasAgentAccess()) {
-            return !$this->isAgent();
+            return ! $this->isAgent();
         }
+
         return false;
     }
 

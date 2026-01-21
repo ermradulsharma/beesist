@@ -26,6 +26,7 @@ class UserTypeCheck
                 return $next($request);
             }
         }
+
         return redirect()->route('frontend.index')->withFlashDanger(__('You do not have access to do that.'));
     }
 }

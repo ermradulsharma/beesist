@@ -111,7 +111,9 @@ class PerformanceTable extends DataTableComponent
     {
         $user = Auth::user();
         $properties = PropertyReport::query()
-            ->select('agent_id', 'property_status',
+            ->select(
+                'agent_id',
+                'property_status',
                 \DB::raw('SUM(property_reports.rental_applications) as total_rental_applications'),
                 \DB::raw('SUM(property_reports.tenancy_agreements) as total_tenancy_agreements'),
                 \DB::raw('SUM(property_reports.showings) as total_showings'),

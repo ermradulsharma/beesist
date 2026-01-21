@@ -11,7 +11,10 @@ use Modules\Property\Entities\ShowingApplication;
 class AdminShowing extends Notification
 {
     use Queueable;
-    public $showing, $message, $subject;
+    public $showing;
+    public $message;
+    public $subject;
+
     /**
      * Create a new notification instance.
      *
@@ -43,7 +46,7 @@ class AdminShowing extends Notification
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->greeting('Hello Admin')
             ->line(new HtmlString($this->message));
     }

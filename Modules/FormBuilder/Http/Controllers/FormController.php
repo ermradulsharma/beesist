@@ -67,6 +67,7 @@ class FormController extends Controller
         // generate a random identifier
         $input['identifier'] = $user->id.'-'.Helper::randomString(20);
         $created = Form::create($input);
+
         try {
             // dispatch the event
             event(new FormCreated($created));

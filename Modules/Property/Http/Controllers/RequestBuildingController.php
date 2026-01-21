@@ -19,6 +19,7 @@ class RequestBuildingController extends Controller
     public function index(Request $request, $id = null)
     {
         $countries = Countries();
+
         return view('property::building.requestBuilding', compact('countries'));
     }
 
@@ -49,8 +50,8 @@ class RequestBuildingController extends Controller
             return redirect()->back()->withErrors($validation)->withInput();
         }
         $buildingObj = RequestBuilding::find($request->requestId);
-        if (!$request->requestId) {
-            $buildingObj = new RequestBuilding;
+        if (! $request->requestId) {
+            $buildingObj = new RequestBuilding();
             $buildingObj->user_id = Auth::user()->id;
         }
         $buildingObj->title = $request->title;
@@ -60,6 +61,7 @@ class RequestBuildingController extends Controller
         if ($buildingObj->save()) {
             userEntity(Auth::user()->id, 'building_request', $buildingObj->id);
         }
+
         return redirect()->route(rolebased() . '.buildings.request')->withFlashSuccess(__('The building was successfully created.'));
     }
 
@@ -81,6 +83,7 @@ class RequestBuildingController extends Controller
     public function edit($id)
     {
         $countries = Countries();
+
         return view('property::building.requestBuilding', compact('countries'));
     }
 

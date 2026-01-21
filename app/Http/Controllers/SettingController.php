@@ -5,9 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\File;
-use Intervention\Image\Facades\Image;
-use Str;
 
 class SettingController extends Controller
 {
@@ -24,19 +21,20 @@ class SettingController extends Controller
             if ($termsConditions) {
                 $data = json_decode($termsConditions->value, true) ?? [];
             }
+
             return view('backend.account.termCandition', compact('data'));
         }
 
         try {
             $requestData = $request->all();
             $termsConditions = [];
-            if (isset($requestData['terms_conditions']) && !empty($requestData['terms_conditions'])) {
+            if (isset($requestData['terms_conditions']) && ! empty($requestData['terms_conditions'])) {
                 $termsConditions['terms_conditions'] = $requestData['terms_conditions'];
             }
 
             $settingObj = Setting::where(['account_id' => Auth::user()->id, 'key' => 'terms_conditions'])->first();
-            if (!$settingObj) {
-                $settingObj = new Setting;
+            if (! $settingObj) {
+                $settingObj = new Setting();
                 $settingObj->account_id = Auth::user()->id;
                 $settingObj->key = 'terms_conditions';
                 $settingObj->description = 'Users terms & conditions';
@@ -58,23 +56,26 @@ class SettingController extends Controller
             if ($privacyPolicy) {
                 $data = json_decode($privacyPolicy->value, true) ?? [];
             }
+
             return view('backend.account.privacyPolicy', compact('data'));
         }
+
         try {
             $requestData = $request->all();
             $privacyPolicy = [];
-            if (isset($requestData['privacy_policy']) && !empty($requestData['privacy_policy'])) {
+            if (isset($requestData['privacy_policy']) && ! empty($requestData['privacy_policy'])) {
                 $privacyPolicy['privacy_policy'] = $requestData['privacy_policy'];
             }
             $settingObj = Setting::where(['account_id' => Auth::user()->id, 'key' => 'privacy_policy'])->first();
-            if (!$settingObj) {
-                $settingObj = new Setting;
+            if (! $settingObj) {
+                $settingObj = new Setting();
                 $settingObj->account_id = Auth::user()->id;
                 $settingObj->key = 'privacy_policy';
                 $settingObj->description = 'Users Privacy Policy';
             }
             $settingObj->value = json_encode($privacyPolicy);
             $settingObj->save();
+
             return back()->withFlashSuccess(__('Privacy Policy Successfully Submitted'));
         } catch (\Exception $e) {
             return back()->withFlashDanger(__($e->getMessage()));
@@ -90,8 +91,10 @@ class SettingController extends Controller
             if ($generalSetting) {
                 $data = json_decode($generalSetting->value, true) ?? [];
             }
+
             return view('backend.account.siteSetting', compact('data'));
         }
+
         try {
             $userId = Auth::user()->id;
             $requestData = $request->all();
@@ -118,6 +121,7 @@ class SettingController extends Controller
             $requestData = array_merge($existingSettings, $requestData);
             $settingObj->value = json_encode($requestData);
             $settingObj->save();
+
             return back()->withFlashSuccess(__('Site Setting Successfully Submitted'));
         } catch (\Exception $e) {
             return back()->withFlashDanger(__($e->getMessage()));

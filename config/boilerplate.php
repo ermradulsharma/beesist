@@ -24,7 +24,7 @@ return [
                     'timeout' => 5,
                 ],
             ],
-            'login'        => filter_var(env('LOGIN_CAPTCHA_STATUS', false), FILTER_VALIDATE_BOOLEAN),
+            'login' => filter_var(env('LOGIN_CAPTCHA_STATUS', false), FILTER_VALIDATE_BOOLEAN),
             'registration' => filter_var(env('REGISTRATION_CAPTCHA_STATUS', false), FILTER_VALIDATE_BOOLEAN),
         ],
 
@@ -43,7 +43,7 @@ return [
              * Whether or not a user can change their email address after
              * their account has already been created
              */
-            'change_email'       => filter_var(env('CHANGE_EMAIL', true), FILTER_VALIDATE_BOOLEAN),
+            'change_email' => filter_var(env('CHANGE_EMAIL', true), FILTER_VALIDATE_BOOLEAN),
 
             /*
              * When creating users from the backend, only allow the assigning of roles and not individual permissions
@@ -75,7 +75,7 @@ return [
             /*
              * Whether or not the register route and view are active
              */
-            'registration'  => filter_var(env('ENABLE_REGISTRATION', true), FILTER_VALIDATE_BOOLEAN),
+            'registration' => filter_var(env('ENABLE_REGISTRATION', true), FILTER_VALIDATE_BOOLEAN),
 
             /*
              * When active, a user can only have one session active at a time
@@ -83,7 +83,7 @@ return [
              * (They can only be logged into one place at a time, all others will be logged out)
              * AuthenticateSession middleware must be enabled
              */
-            'single_login'  => filter_var(env('SINGLE_LOGIN', false), FILTER_VALIDATE_BOOLEAN),
+            'single_login' => filter_var(env('SINGLE_LOGIN', false), FILTER_VALIDATE_BOOLEAN),
         ],
 
         'role' => [
@@ -93,10 +93,10 @@ return [
              * Should be Administrator by design and unable to change from the backend
              * It is not recommended to change
              */
-            'admin'  => 'Administrator',
-            'manager'=> 'Manager',
-            'owner'  => 'Owner',
-            'agent'  => 'Agent',
+            'admin' => 'Administrator',
+            'manager' => 'Manager',
+            'owner' => 'Owner',
+            'agent' => 'Agent',
             'tenant' => 'Tenant',
         ],
     ],

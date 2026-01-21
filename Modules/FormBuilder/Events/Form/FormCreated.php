@@ -8,7 +8,8 @@ use Modules\FormBuilder\Entities\Form;
 
 class FormCreated
 {
-    use Queueable, SerializesModels;
+    use Queueable;
+    use SerializesModels;
 
     public $form;
 

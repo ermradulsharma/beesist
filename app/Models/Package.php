@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Package extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
     protected $fillable = [
         'stripe_product_id',
         'stripe_price_id',
@@ -19,6 +20,7 @@ class Package extends Model
         'amount',
         'status',
     ];
+
     public function services()
     {
         return $this->belongsToMany(Service::class, 'package_services', 'package_id', 'service_id');
@@ -29,7 +31,8 @@ class Package extends Model
         return $this->belongsToMany(Service::class, 'package_services');
     }
 
-    public function package(){
+    public function package()
+    {
         return $this->hasMany(PackageService::class, 'package_id', 'id');
     }
 }

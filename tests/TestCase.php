@@ -15,7 +15,8 @@ use Illuminate\Support\Facades\Artisan;
  */
 abstract class TestCase extends BaseTestCase
 {
-    use CreatesApplication, RefreshDatabase;
+    use CreatesApplication;
+    use RefreshDatabase;
 
     public function setUp(): void
     {
@@ -39,7 +40,7 @@ abstract class TestCase extends BaseTestCase
 
     protected function loginAsAdmin($admin = false)
     {
-        if (!$admin) {
+        if (! $admin) {
             $admin = $this->getMasterAdmin();
         }
 

@@ -25,4 +25,3 @@ class BuildingFactory extends Factory
         ];
     }
 }
-

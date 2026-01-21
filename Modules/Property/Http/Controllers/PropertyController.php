@@ -31,7 +31,7 @@ class PropertyController extends Controller
      */
     public function index()
     {
-        return view('property::property.index')->withBuildings(new Building);
+        return view('property::property.index')->withBuildings(new Building());
     }
 
     /**
@@ -54,6 +54,7 @@ class PropertyController extends Controller
     public function store(Request $request)
     {
         DB::beginTransaction();
+
         try {
             if (Auth::check()) {
                 $request->validate([
@@ -94,6 +95,7 @@ class PropertyController extends Controller
                     if (count($agentIds) > 0) {
                         foreach ($agentIds as $key => $agentId) {
                             $agentObj = User::find($agentId);
+
                             try {
                                 $agentObj->notify(new RentalApplicationNotification($agentObj, $subject, $content));
                                 Log::info('Notifying property agent: ' . $agentId);
@@ -128,6 +130,7 @@ class PropertyController extends Controller
             }
         } catch (Exception $e) {
             DB::rollBack();
+
             throw new GeneralException(__('There was a problem creating property.'));
         }
     }
@@ -183,7 +186,7 @@ class PropertyController extends Controller
         $splittedstring = explode(',', $property->prop_status);
         $splittedstring_c = $request->prop_status;
         if (in_array('For Rent', $splittedstring) && in_array('Rented', $splittedstring_c)) {
-            if (!empty($property->status_changed_on)) {
+            if (! empty($property->status_changed_on)) {
                 $to_date = $property->status_changed_on;
             } else {
                 $to_date = $property->created_at;
@@ -191,7 +194,7 @@ class PropertyController extends Controller
             $to = Carbon::parse($to_date);
             $from = Carbon::now()->format('Y-m-d H:i:s');
             $days_on_market = $to->diffInDays($from);
-            if (!empty($property->days_on_market)) {
+            if (! empty($property->days_on_market)) {
                 $data['days_on_market'] = $property->days_on_market + $days_on_market;
             } else {
                 $data['days_on_market'] = $days_on_market;
@@ -271,7 +274,7 @@ class PropertyController extends Controller
     private function deleteMedia($id = null)
     {
         $file = Media::find($id);
-        if (!$file) {
+        if (! $file) {
             return 'Media not found';
         }
         $file->delete();
@@ -332,18 +335,18 @@ class PropertyController extends Controller
         $allowedFileTypes = array_merge($allowedImageTypes, ['pdf']);
         $allowedTypes = ($type == 'property_photos') ? $allowedImageTypes : $allowedFileTypes;
         $fileExtension = strtolower($file->getClientOriginalExtension());
-        if (!in_array($fileExtension, $allowedTypes)) {
+        if (! in_array($fileExtension, $allowedTypes)) {
             Log::warning('Unsupported file type uploaded: ' . $fileExtension);
 
             return;
         }
 
         $baseDir = public_path('uploads/properties/' . $id . '/');
-        if (!File::isDirectory($baseDir)) {
+        if (! File::isDirectory($baseDir)) {
             File::makeDirectory($baseDir, 0777, true, true);
         }
         $typeDir = $baseDir . '/' . $type;
-        if (!File::isDirectory($typeDir)) {
+        if (! File::isDirectory($typeDir)) {
             File::makeDirectory($typeDir, 0777, true, true);
         }
         chmod($baseDir, 0777);
@@ -351,7 +354,7 @@ class PropertyController extends Controller
         $original = $typeDir . '/original';
 
         foreach ([$dirThumb, $original] as $directory) {
-            if (!File::isDirectory($directory)) {
+            if (! File::isDirectory($directory)) {
                 File::makeDirectory($directory, 0777, true, true);
             }
         }
@@ -359,7 +362,7 @@ class PropertyController extends Controller
         $fileName = generateFileName($file);
         if ($fileExtension == 'pdf') {
             $fileName = generateFileName($file);
-            if (!File::isDirectory($typeDir)) {
+            if (! File::isDirectory($typeDir)) {
                 File::makeDirectory($typeDir, 0777, true, true);
             }
             $file->move($typeDir, $fileName);
@@ -400,7 +403,7 @@ class PropertyController extends Controller
             $directory = 'building_photos';
             $route = route('building.single', [$data->slug]);
         }
-        if (!$data) {
+        if (! $data) {
             return '';
         }
         $id = $data->id;
@@ -466,12 +469,13 @@ class PropertyController extends Controller
 
             if ($result->owner_email) {
                 $userObj = User::where('email', $result->owner_email)->first();
-                if (!$userObj) {
-                    $userObj = new User;
+                if (! $userObj) {
+                    $userObj = new User();
                     $userObj->name = $result->owner_name;
                     $userObj->email = $result->owner_email;
                 }
                 $email2 = $result->owner2_email ?? null;
+
                 try {
                     $userObj->notify(new PerformanceReportNotification($result->owner_name, $subject, $message, $email2));
                 } catch (\Exception $e) {

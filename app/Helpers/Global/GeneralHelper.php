@@ -604,6 +604,7 @@ if (! function_exists('getManagerUsersByRole')) {
     function getManagerUsersByRole($role)
     {
         $users = null;
+
         try {
             $user = Auth::user();
             if (! $user) {
@@ -621,6 +622,7 @@ if (! function_exists('getManagerUsersByRole')) {
             }
         } catch (Exception $e) {
             Log::error('Error in getManagerUsersByRole: ' . $e->getMessage());
+
             throw new GeneralException(__('User does not have sufficient access.'));
         }
 
@@ -728,6 +730,7 @@ if (! function_exists('managerSetting')) {
     function managerSetting($request, $key, $filename, $width = null, $height = null)
     {
         $userId = Auth::user()->id;
+
         try {
             if ($request->hasFile($key)) {
                 $file = $request->file($key);

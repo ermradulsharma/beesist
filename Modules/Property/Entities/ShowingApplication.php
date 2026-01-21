@@ -11,7 +11,8 @@ use Illuminate\Notifications\Notifiable;
 
 class ShowingApplication extends Model
 {
-    use HasFactory, Notifiable;
+    use HasFactory;
+    use Notifiable;
 
     protected $fillable = ['showing_id', 'property_id', 'agent_id', 'tenant_id', 'showing_date', 'first_name', 'last_name', 'email', 'phone', 'comments', 'status', 'reason_of_rejection', 'notify_status', 'showing_type', 'different_time'];
 

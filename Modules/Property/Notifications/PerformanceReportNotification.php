@@ -3,9 +3,8 @@
 namespace Modules\Property\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\HtmlString;
 
 class PerformanceReportNotification extends Notification
@@ -15,6 +14,7 @@ class PerformanceReportNotification extends Notification
     public $subject;
     public $message;
     public $email2;
+
     /**
      * Create a new notification instance.
      */
@@ -41,7 +41,7 @@ class PerformanceReportNotification extends Notification
     {
         $greeting = 'Hello ' . $this->name;
 
-        $mailMessage = (new MailMessage)
+        $mailMessage = (new MailMessage())
             ->subject($this->subject)
             ->greeting($greeting)
             ->line(new HtmlString($this->message))
@@ -49,6 +49,7 @@ class PerformanceReportNotification extends Notification
         if ($this->email2) {
             $mailMessage->cc($this->email2);
         }
+
         return $mailMessage;
     }
 

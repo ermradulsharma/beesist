@@ -1,6 +1,7 @@
 <?php
 
 // namespace App\Http\Middleware;
+
 namespace App\Domains\Auth\Http\Middleware;
 
 use Closure;
@@ -20,6 +21,7 @@ class OwnerCheck
         if ($request->user() && $request->user()->hasRole('Property Owner')) {
             return $next($request);
         }
+
         return redirect()->route('frontend.index')->withFlashDanger(__('You do not have access to do that.'));
     }
 }

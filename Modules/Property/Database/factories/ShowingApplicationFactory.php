@@ -25,4 +25,3 @@ class ShowingApplicationFactory extends Factory
         ];
     }
 }
-

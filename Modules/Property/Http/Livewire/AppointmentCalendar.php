@@ -114,7 +114,7 @@ class AppointmentCalendar extends Component
         // Notification For Appointment with
         $msg = $this->appointmentMessage($data, $name,  $type);
         $appointmentDetails = User::where('email', $data['email'])->first();
-        if (!$appointmentDetails) {
+        if (! $appointmentDetails) {
             $appointmentDetails = new User();
             $appointmentDetails->first_name = $data['first_name'];
             $appointmentDetails->last_name = $data['last_name'];
@@ -142,6 +142,7 @@ class AppointmentCalendar extends Component
             $message .= "<li><strong>Comments:</strong> {$data['comments']}</li>";
         }
         $message .= "</ul>";
+
         return $message;
     }
 
@@ -157,9 +158,9 @@ class AppointmentCalendar extends Component
             $message .= "<li><strong>Comments:</strong> {$data['comments']}</li>";
         }
         $message .= "</ul>";
+
         return $message;
     }
-
 
     public function saveInspection()
     {
@@ -186,7 +187,7 @@ class AppointmentCalendar extends Component
         // Notification For Appointment with
         $msg = $this->inspectionMessage($data, $name, $propertyObj, $type);
         $appointmentDetails = User::where('email', $data['email'])->first();
-        if (!$appointmentDetails) {
+        if (! $appointmentDetails) {
             $appointmentDetails = new User();
             $appointmentDetails->first_name = $data['first_name'];
             $appointmentDetails->last_name = $data['last_name'];
@@ -224,7 +225,7 @@ class AppointmentCalendar extends Component
         $userObj->notify(new AppointmentNotification($name, $subject, $message));
 
         $appointmentDetails = User::where('email', $data['email'])->first();
-        if (!$appointmentDetails) {
+        if (! $appointmentDetails) {
             $appointmentDetails = new User();
             $appointmentDetails->first_name = $data['first_name'];
             $appointmentDetails->last_name = $data['last_name'];

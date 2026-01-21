@@ -25,4 +25,3 @@ class PageFactory extends Factory
         ];
     }
 }
-

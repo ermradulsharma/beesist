@@ -3,15 +3,17 @@
 namespace Modules\RentalApplication\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\HtmlString;
 
 class RentalApplication extends Notification
 {
     use Queueable;
-    public $rentalApplicationObj, $subject, $textBody, $textBody2;
+    public $rentalApplicationObj;
+    public $subject;
+    public $textBody;
+    public $textBody2;
 
     /**
      * Create a new notification instance.
@@ -45,20 +47,21 @@ class RentalApplication extends Notification
      */
     public function toMail($notifiable)
     {
-        $mailMessage = (new MailMessage)
+        $mailMessage = (new MailMessage())
             ->subject($this->subject)
             ->greeting('Hello ' . $this->rentalApplicationObj['first_name'] . ',')
             ->line(new HtmlString($this->textBody));
-        if (!is_null($this->textBody2)) {
+        if (! is_null($this->textBody2)) {
             $mailMessage->line(new HtmlString($this->textBody2));
         }
-        if (!is_null($this->rentalApplicationObj['id'])) {
+        if (! is_null($this->rentalApplicationObj['id'])) {
             $mailMessage->action('Preview Property', route('rental_application.rentalApplicationPreviw', ['id' => encrypt($this->rentalApplicationObj['id'])]));
         }
         $mailMessage->line('If you are unable to provide a reference, please let us know by replying to this email.')
             ->line('Thank you for your cooperation.')
             ->line('Regards,')
             ->line(config('app.name') . ' Team');
+
         return $mailMessage;
     }
 

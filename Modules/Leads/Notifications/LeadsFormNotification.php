@@ -3,16 +3,16 @@
 namespace Modules\Leads\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\HtmlString;
 
 class LeadsFormNotification extends Notification
 {
     use Queueable;
-    public $data, $subject, $message;
-
+    public $data;
+    public $subject;
+    public $message;
 
     /**
      * Create a new notification instance.
@@ -45,7 +45,7 @@ class LeadsFormNotification extends Notification
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject($this->subject)
             ->greeting('Hello ' . $this->data['name']  . ',')
             ->line(new HtmlString($this->message))

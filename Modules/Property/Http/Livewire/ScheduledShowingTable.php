@@ -138,12 +138,15 @@ class ScheduledShowingTable extends DataTableComponent
                 switch ($row->status) {
                     case '1':
                         $buttons = $editButton.$rejectButton.$deleteButton;
+
                         break;
                     case '2':
                         $buttons = $editButton.$approveButton.$deleteButton;
+
                         break;
                     default:
                         $buttons = $editButton.$approveButton.$rejectButton.$deleteButton;
+
                         break;
                 }
 

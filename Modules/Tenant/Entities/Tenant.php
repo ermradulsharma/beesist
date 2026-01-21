@@ -3,8 +3,8 @@
 namespace Modules\Tenant\Entities;
 
 use App\Domains\Auth\Models\User;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Property\Entities\Property;
 
 class Tenant extends Model
@@ -27,4 +27,3 @@ class Tenant extends Model
         return $this->belongsTo(Property::class, 'property_id')->select('id', 'title');
     }
 }
-

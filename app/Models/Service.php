@@ -8,17 +8,20 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Service extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
     protected $fillable = [
         'title',
         'status',
     ];
+
     public function packages()
     {
         return $this->belongsToMany(Package::class, 'package_services', 'service_id', 'package_id');
     }
 
-    public function packageServices(){
+    public function packageServices()
+    {
         return $this->hasMany(PackageService::class, 'service_id', 'id');
     }
 }

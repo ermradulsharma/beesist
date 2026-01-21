@@ -19,17 +19,14 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use Modules\Leads\Entities\PropertyManagementAgreement;
 use Modules\Leads\Entities\PropertyManagementAgreementForm;
-use Modules\Leads\Entities\UserEntity;
 use Modules\Leads\Notifications\ApplicationAttachementNotification;
 use Modules\Leads\Notifications\ApplicationNotification;
-use Modules\Leads\Notifications\ConfirmationEmailNotification;
-use Modules\Leads\Notifications\FormNotification;
 use Modules\Leads\Notifications\LeadsFormNotification;
 use Modules\Property\Entities\Media;
 use Modules\Property\Entities\Property;
+use PDF;
 use Response;
 use Str;
-use PDF;
 
 class LeadsController extends Controller
 {
@@ -38,6 +35,7 @@ class LeadsController extends Controller
      * @return Renderable
      */
     protected $userService;
+
     public function __construct(UserService $userService)
     {
         $this->userService = $userService;
@@ -78,9 +76,10 @@ class LeadsController extends Controller
             }
             $request->validate($rules);
             DB::beginTransaction();
+
             try {
                 $checkUser = User::where('email', $request->email)->first();
-                if (!$checkUser) {
+                if (! $checkUser) {
                     $password = str_random(8);
                     $userData = [
                         'first_name' => $request->first_name,
@@ -91,7 +90,7 @@ class LeadsController extends Controller
                         'country' => $request->country ?? 'CA',
                         'type' => User::TYPE_USER,
                         'roles' => 'Property Owner',
-                        'password' => bcrypt($password)
+                        'password' => bcrypt($password),
                     ];
                     $createUser = $this->createUser($userData);
                     userEntity(Auth::user()->id, 'owner', $createUser->id);
@@ -99,12 +98,12 @@ class LeadsController extends Controller
                     if ($createUser) {
                         try {
                             $subject = appName() . ' - New User Registered!';
-                            $message  = 'We hope this message finds you well.<br>';
-                            $message  .= 'A new user has registered on ' . appName() . '. Here are the details:<br>';
-                            $message  .= '<strong> Name:    </strong>' . $createUser->name .  '<br>';
-                            $message  .= '<strong> E-mail:  </strong>' . $createUser->email . '<br>';
-                            $message  .= '<strong> Phone:   </strong>' . $createUser->phone . '<br>';
-                            $message  .= '<strong> Country: </strong>' . $userData['country'];
+                            $message = 'We hope this message finds you well.<br>';
+                            $message .= 'A new user has registered on ' . appName() . '. Here are the details:<br>';
+                            $message .= '<strong> Name:    </strong>' . $createUser->name .  '<br>';
+                            $message .= '<strong> E-mail:  </strong>' . $createUser->email . '<br>';
+                            $message .= '<strong> Phone:   </strong>' . $createUser->phone . '<br>';
+                            $message .= '<strong> Country: </strong>' . $userData['country'];
                             if (Auth::check() && Auth::user()->hasAnyRole(['Administrator', 'Property Manager'])) {
                                 $adminObj = User::find(Auth::user()->id);
                                 $adminObj->notify(new LeadsFormNotification($adminObj, $subject, $message));
@@ -161,13 +160,16 @@ class LeadsController extends Controller
                 $textBody .= '<a href="' . url('/property-info') . '/' . Crypt::encryptString($userId) . '/' . Crypt::encryptString($pmaDetails->id) . '">Click Here</a>';
                 $ownerDetails->notify(new LeadsFormNotification($ownerDetails, $subject2, $textBody));
                 DB::commit();
+
                 return redirect()->route('admin.leads.index')->with('flash_success', __('Form submitted successfully!'));
             } catch (Exception $e) {
                 DB::rollback();
                 Log::error($e->getMessage() . ' Line No. ' . $e->getLine());
+
                 return redirect()->back()->flash('flash_danger', $e->getMessage());
             }
         }
+
         return view('leads::backend.manuallyForm');
     }
 
@@ -212,8 +214,8 @@ class LeadsController extends Controller
         $rules = [];
         foreach ($request->all() as $key => $val) {
             if (in_array($key, ['located_3', 'located_o2_3', 'manage_p_at_9', 'items_inc_17', 'reg_own_23', 're_reg_own_28', 'ac_holder_30', 'bank_details_31', 'resident_won1', 'resident_won2', 'occupancy_tenant_info'])) {
-                $tableArray[$key] = (!empty($val) ? serialize(json_encode($val)) : null);
-            } elseif ($key === 'voided_check' && !empty($val)) {
+                $tableArray[$key] = (! empty($val) ? serialize(json_encode($val)) : null);
+            } elseif ($key === 'voided_check' && ! empty($val)) {
                 $rules = [
                     'voided_check' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:10000',
                 ];
@@ -227,7 +229,7 @@ class LeadsController extends Controller
                 foreach (['voided_check', 'ins_policy'] as $fileKey) {
                     if ($request->hasFile($fileKey)) {
                         $typeDir = $baseDir . ($fileKey == 'voided_check' ? 'check/' : 'policy/');
-                        if (!File::isDirectory($typeDir)) {
+                        if (! File::isDirectory($typeDir)) {
                             File::makeDirectory($typeDir, 0777, true, true);
                         }
                         $filename = time() . '-' . str_replace(" ", "-", $request->file($fileKey)->getClientOriginalName());
@@ -241,11 +243,11 @@ class LeadsController extends Controller
             }
         }
         $tableArray = array_merge($tableArray, $uploadedFiles);
-        if ($request->has('id') && !empty($request->id)) {
+        if ($request->has('id') && ! empty($request->id)) {
             $data = PropertyManagementAgreementForm::find($request->id);
             if ($data->form_step == 0) {
                 // $access_token2 = bin2hex(random_bytes(16));
-                $resident_won2 = (!empty($request->resident_won2) ? serialize(json_encode($request->resident_won2)) : NULL);
+                $resident_won2 = (! empty($request->resident_won2) ? serialize(json_encode($request->resident_won2)) : null);
                 $rules = [
                     'own2_identity' => 'required',
                     'initial_2' => 'required',
@@ -294,7 +296,7 @@ class LeadsController extends Controller
                 foreach (['own1_identity', 'own2_identity'] as $fileKey) {
                     if ($request->hasFile($fileKey)) {
                         $baseDir = public_path('uploads/pma/ownerIdentity/');
-                        if (!File::isDirectory($baseDir)) {
+                        if (! File::isDirectory($baseDir)) {
                             File::makeDirectory($baseDir, 0777, true, true);
                         }
                         $filename = time() . '-' . str_replace(" ", "-", $request->file($fileKey)->getClientOriginalName());
@@ -304,39 +306,39 @@ class LeadsController extends Controller
                     }
                 }
                 PropertyManagementAgreementForm::find($request->id)->update([
-                    'fName_1_2'     => $request->fName_1_2,
-                    'lName_2_2'     => $request->lName_2_2,
+                    'fName_1_2' => $request->fName_1_2,
+                    'lName_2_2' => $request->lName_2_2,
                     'own2_identity' => $tableArray['own2_identity'],
-                    'phone_o2_4'    => $request->phone_o2_4,
-                    'located_o2_3'  => (!empty($request->located_o2_3) ? serialize(json_encode($request->located_o2_3)) : NULL),
-                    'reg_own_23'    => (!empty($request->reg_own_23) ? serialize(json_encode($request->reg_own_23)) : NULL),
+                    'phone_o2_4' => $request->phone_o2_4,
+                    'located_o2_3' => (! empty($request->located_o2_3) ? serialize(json_encode($request->located_o2_3)) : null),
+                    'reg_own_23' => (! empty($request->reg_own_23) ? serialize(json_encode($request->reg_own_23)) : null),
                     'resident_won2' => $resident_won2,
-                    'initial_2'     => $request->initial_2,
-                    'initial_4'     => $request->initial_4,
-                    'initial_6'     => $request->initial_6,
-                    'initial_8'     => $request->initial_8,
-                    'initial_10'    => $request->initial_10,
-                    'initial_12'    => $request->initial_12,
-                    'initial_14'    => $request->initial_14,
-                    'initial_16'    => $request->initial_16,
-                    'initial_18'    => $request->initial_18,
-                    'initial_20'    => $request->initial_20,
-                    'initial_22'    => $request->initial_22,
-                    'initial_24'    => $request->initial_24,
-                    'pName_20'      => $request->pName_20,
-                    'date_21'       => $request->date_21,
-                    'pName_26'      => $request->pName_26,
-                    'date_27'       => $request->date_27,
-                    'pw_name_34'    => $request->pw_name_34,
-                    'date_35'       => $request->date_35,
+                    'initial_2' => $request->initial_2,
+                    'initial_4' => $request->initial_4,
+                    'initial_6' => $request->initial_6,
+                    'initial_8' => $request->initial_8,
+                    'initial_10' => $request->initial_10,
+                    'initial_12' => $request->initial_12,
+                    'initial_14' => $request->initial_14,
+                    'initial_16' => $request->initial_16,
+                    'initial_18' => $request->initial_18,
+                    'initial_20' => $request->initial_20,
+                    'initial_22' => $request->initial_22,
+                    'initial_24' => $request->initial_24,
+                    'pName_20' => $request->pName_20,
+                    'date_21' => $request->date_21,
+                    'pName_26' => $request->pName_26,
+                    'date_27' => $request->date_27,
+                    'pw_name_34' => $request->pw_name_34,
+                    'date_35' => $request->date_35,
                     // 'access_token'  => $access_token2,
-                    'form_step'     => '1',
+                    'form_step' => '1',
                 ]);
                 $current_token = PropertyManagementAgreementForm::where('id', $request->id)->value('access_token');
                 $managerObj = User::where('uuid', $request->account_id)->first();
                 if ($managerObj) {
                     $managerSubject = appName() . ' - Property Management Application [Agent]!';
-                    $managerContent  = 'We hope this message finds you well. <br>';
+                    $managerContent = 'We hope this message finds you well. <br>';
                     $managerContent .= 'A property management application has been submitted. Please review the details and take necessary actions.<br>';
                     $managerContent .= 'To view the application form, click the link below:<br>';
                     $managerContent .= '<div style="text-align: center;"><a href="' . route('pma.viewForm', ['action' => 'view', 'form_id' => Crypt::encryptString($data->id)]) . '" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: #fff; text-decoration: none; border-radius: 5px;">View Property Management Agreement</a></div><br>'; // for view form
@@ -344,9 +346,10 @@ class LeadsController extends Controller
                     $managerContent .= 'If you have any questions or need further assistance, feel free to reach out.<br><br>';
                     $managerObj->notify(new ApplicationNotification($managerObj->first_name, $managerSubject, $managerContent));
                 }
-                if ($data->n_own == 2 && $data->bp == 1 && !empty($data->won2_email)) {
+                if ($data->n_own == 2 && $data->bp == 1 && ! empty($data->won2_email)) {
                     $this->sendNotification($data->fName_1_2, $data->won2_email, $request->account_id, $data->user_id, $data->id);
                 }
+
                 return redirect()->route('pma.viewForm', ['action' => 'view', 'form_id' => Crypt::encryptString($data->id)])->with('status', 'Updated successfully!');
             } elseif ($data->form_step == 1) {
                 $access_token3 = bin2hex(random_bytes(16));
@@ -386,12 +389,12 @@ class LeadsController extends Controller
                     $savePath = $baseDir . 'beesist-PMA-' . $fileName . '.pdf';
 
                     // Create directory if it doesn't exist
-                    if (!File::isDirectory($baseDir)) {
+                    if (! File::isDirectory($baseDir)) {
                         File::makeDirectory($baseDir, 0777, true, true);
                     }
 
                     // Generate PDF if it doesn't exist already
-                    if (!file_exists($savePath)) {
+                    if (! file_exists($savePath)) {
                         ini_set('max_execution_time', 0);
                         $pdf = PDF::loadView('forms.formdownload', compact('countries', 'data'));
                         $pdf->getDomPDF()->set_option("enable_php", true);
@@ -413,7 +416,7 @@ class LeadsController extends Controller
 
                 $access_form = url('pma-form-2') . '/' . $data->id . '/' . Crypt::encryptString($data->id);
                 $viewForm = route('pma.viewForm', ['action' => 'view', 'form_id' => Crypt::encryptString($data->id)]); // url('pmaform/view') . '/' . Crypt::encryptString($data->id);
-                $agentForm =  $editPMA = route('pma.agentForm', ['account_id' => Auth::user()->uuid, 'formId' => Crypt::encryptString($data->id)]);
+                $agentForm = $editPMA = route('pma.agentForm', ['account_id' => Auth::user()->uuid, 'formId' => Crypt::encryptString($data->id)]);
 
                 $subject = appName() . ' Property Management Agreement Received';
                 $message = 'We hope this message finds you well. <br>';
@@ -440,7 +443,7 @@ class LeadsController extends Controller
                         if ($userObj) {
                             $name = $userObj->first_name;
                         } else {
-                            $userObj = new User;
+                            $userObj = new User();
                             $userObj->name = $data->fName_1_2;
                             $userObj->email = $email;
                         }
@@ -456,6 +459,7 @@ class LeadsController extends Controller
                         $managerObj->notify(new ApplicationAttachementNotification($managerObj->first_name, $subject, $message, $attachment));
                     }
                 }
+
                 return redirect()->route('pma.viewForm', ['action' => 'view', 'form_id' => Crypt::encryptString($data->id)])->with('status', 'Updated successfully!');
             }
         } else {
@@ -487,7 +491,7 @@ class LeadsController extends Controller
             if (empty($request->voided_check)) {
                 $rules['bank_details_31.*'] = 'required';
             }
-            if (!empty($request->items_inc_17[0])) {
+            if (! empty($request->items_inc_17[0])) {
                 $rules['parking_17_1'] = 'required';
             }
             $messages = [
@@ -500,7 +504,7 @@ class LeadsController extends Controller
             if ($validator->fails()) {
                 return redirect()->back()->withErrors($validator)->withInput();
             }
-            if (!isset($request->furn_excess_12)) {
+            if (! isset($request->furn_excess_12)) {
                 $tableArray['furn_excess_12'] = '0';
             }
             if (empty($request->bp)) {
@@ -511,7 +515,7 @@ class LeadsController extends Controller
             foreach (['own1_identity', 'own2_identity'] as $fileKey) {
                 if ($request->hasFile($fileKey)) {
                     $typeDir = $baseDir . 'ownerIdentity/';
-                    if (!File::isDirectory($typeDir)) {
+                    if (! File::isDirectory($typeDir)) {
                         File::makeDirectory($typeDir, 0777, true, true);
                     }
                     $filename = time() . '-' . str_replace(" ", "-", $request->file($fileKey)->getClientOriginalName());
@@ -520,7 +524,7 @@ class LeadsController extends Controller
                     }
                 }
             }
-            if (!empty($request->owner_title)) {
+            if (! empty($request->owner_title)) {
                 $rules = [
                     'owner_title' => 'required|mimes:jpeg,png,jpg,gif|max:10000',
                 ];
@@ -536,7 +540,7 @@ class LeadsController extends Controller
                 foreach (['owner_title'] as $fileKey) {
                     if ($request->hasFile($fileKey)) {
                         $typeDir = $baseDir . 'ownerTitle/';
-                        if (!File::isDirectory($typeDir)) {
+                        if (! File::isDirectory($typeDir)) {
                             File::makeDirectory($typeDir, 0777, true, true);
                         }
                         $filename = time() . '-' . str_replace(" ", "-", $request->file($fileKey)->getClientOriginalName());
@@ -548,20 +552,20 @@ class LeadsController extends Controller
             }
             $insertForm = PropertyManagementAgreementForm::create($tableArray);
             $data = PropertyManagementAgreementForm::find($insertForm->id);
-            if ($data->n_own == 2 && $data->bp == 1 && !empty($data->won2_email)) {
+            if ($data->n_own == 2 && $data->bp == 1 && ! empty($data->won2_email)) {
                 if ($data->won2_email) {
-                    $ownerEmail2     = $data->won2_email;
-                    $ownerName2      = $data->fName_1_2;
-                    $ownerSubject2   = appName() . ' - Property Management Agreement Received!';
-                    $ownerContent2   = 'We hope this message finds you well.';
-                    $ownerContent2  .= 'This document was sent to you for signature by <strong>' . $data->fName_1 . ' ' . $data->lName_2 . '</strong> <br>';
-                    $ownerContent2  .= 'It is a property management agreement for property at <strong>' . $data->address_10 . '</strong>. <br>';
-                    $ownerContent2  .= '<div style="text-align: center;"><a href="' . route('pma.form', ['account_id' => $request->account_id, 'owners' => $data->n_own, 'ap' => $data->bp, 'email2' => Crypt::encrypt($data->won2_email), 'formId' => $data->id]) . '" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: #fff; text-decoration: none; border-radius: 5px;">Fill Property Management Agreement</a></div><br>'; // for access form
-                    $ownerContent2  .= 'Once the agreement is signed by one of our agents, you will receive another link where you can download the PDF for your records. <br>';
-                    $ownerContent2  .= 'If you have any questions or concerns, feel free to contact us.';
+                    $ownerEmail2 = $data->won2_email;
+                    $ownerName2 = $data->fName_1_2;
+                    $ownerSubject2 = appName() . ' - Property Management Agreement Received!';
+                    $ownerContent2 = 'We hope this message finds you well.';
+                    $ownerContent2 .= 'This document was sent to you for signature by <strong>' . $data->fName_1 . ' ' . $data->lName_2 . '</strong> <br>';
+                    $ownerContent2 .= 'It is a property management agreement for property at <strong>' . $data->address_10 . '</strong>. <br>';
+                    $ownerContent2 .= '<div style="text-align: center;"><a href="' . route('pma.form', ['account_id' => $request->account_id, 'owners' => $data->n_own, 'ap' => $data->bp, 'email2' => Crypt::encrypt($data->won2_email), 'formId' => $data->id]) . '" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: #fff; text-decoration: none; border-radius: 5px;">Fill Property Management Agreement</a></div><br>'; // for access form
+                    $ownerContent2 .= 'Once the agreement is signed by one of our agents, you will receive another link where you can download the PDF for your records. <br>';
+                    $ownerContent2 .= 'If you have any questions or concerns, feel free to contact us.';
                     $ownerObj2 = User::where(['email' => $ownerEmail2,])->first();
-                    if (!$ownerObj2) {
-                        $ownerObj2 = new User;
+                    if (! $ownerObj2) {
+                        $ownerObj2 = new User();
                         $ownerObj2->email = $ownerEmail2;
                         $ownerObj2->name = $ownerName2;
                     }
@@ -583,7 +587,7 @@ class LeadsController extends Controller
                 $managerObj = User::where('uuid', $request->account_id)->first();
                 if ($managerObj) {
                     $agentSubject = appName() . ' - Property Management Application!';
-                    $agentContent  = 'We hope this message finds you well. ';
+                    $agentContent = 'We hope this message finds you well. ';
                     $agentContent .= 'A property management application has been submitted. Please review the details and take necessary actions.<br>';
                     $agentContent .= 'To view the application form, click the link below:<br>';
                     $agentContent .= '<div style="text-align: center;"><a href="' . route('pma.pmaRegisterForm', ['account_id' => $request->account_id, 'user_id' => Crypt::encryptString($data->id)]) . '" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: #fff; text-decoration: none; border-radius: 5px;">View Property Management Agreement</a></div><br>'; // for view Property Management Agreement form
@@ -608,21 +612,22 @@ class LeadsController extends Controller
         userEntity($userId, 'property', $propertyObj->id);
         userEntity($userId, 'pma', $data->id);
         $msg = 'Submited successfully!';
+
         return redirect()->route('pma.propertyInfo', ['account_id' => $request->account_id, 'user_id' => Crypt::encryptString($data->user_id), 'id' => Crypt::encryptString($data->id)])->with('status', $msg);
     }
 
     private function sendNotification($ownerName, $ownerEmail, $account_id, $userId, $id)
     {
-        $ownerSubject  = appName() . ' - Property Management Application Submitted!';
-        $ownerContent  = 'We hope this message finds you well. ';
+        $ownerSubject = appName() . ' - Property Management Application Submitted!';
+        $ownerContent = 'We hope this message finds you well. ';
         $ownerContent .= 'Thank you, ' . $ownerName . ',';
         $ownerContent .= 'You have successfully signed your property management agreement. You can review the details by clicking on the link below:<br>';
         $ownerContent .= '<div style="text-align: center;"><a href="' . route('pma.propertyInfo', ['account_id' => $account_id, 'user_id' => Crypt::encryptString($userId), 'id' => Crypt::encryptString($id)]) . '" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: #fff; text-decoration: none; border-radius: 5px;">Fill Property Information</a></div><br>'; // for Property Info
         $ownerContent .= 'If you have any questions or concerns, feel free to contact us.';
 
         $ownerObj = User::where('email', $ownerEmail)->first();
-        if (!$ownerObj) {
-            $ownerObj = new User;
+        if (! $ownerObj) {
+            $ownerObj = new User();
             $ownerObj->email = $ownerEmail;
             $ownerObj->name = $ownerName;
         }
@@ -674,30 +679,30 @@ class LeadsController extends Controller
     {
         if ($request->isMethod('POST')) {
             foreach ($request->all() as $key => $val) {
-                if (!in_array($key, ['stratafiles', 'propertyphotos', 'utilities', 'prop_agents', 'prop_status', 'occupancy_tenant_info', 'way_to_contact'])) {
+                if (! in_array($key, ['stratafiles', 'propertyphotos', 'utilities', 'prop_agents', 'prop_status', 'occupancy_tenant_info', 'way_to_contact'])) {
                     $tableArray[$key] = $val;
                 } elseif ($key == 'utilities' || $key == 'way_to_contact' || $key == 'strata_property_details' || $key == 'occupancy_tenant_info') {
-                    $tableArray[$key] = (!empty($val) ? json_encode($val) : null);
+                    $tableArray[$key] = (! empty($val) ? json_encode($val) : null);
                 } elseif ($key == 'prop_agents' || $key == 'prop_status') {
-                    $tableArray[$key] = (!empty($val) ? implode(',', $val) : null);
+                    $tableArray[$key] = (! empty($val) ? implode(',', $val) : null);
                 }
             }
-            if (!isset($request->title)) {
+            if (! isset($request->title)) {
                 $tableArray['title'] = $request->address;
             }
-            $form_id = !empty($request->form_id) ? $request->form_id : '0';
-            if (isset($request->prop_id) && !empty($request->prop_id)) {
-                $prop_status_old =  Property::find($request->prop_id);
+            $form_id = ! empty($request->form_id) ? $request->form_id : '0';
+            if (isset($request->prop_id) && ! empty($request->prop_id)) {
+                $prop_status_old = Property::find($request->prop_id);
                 if ($prop_status_old) {
                     $splittedstring = explode(',', $prop_status_old->prop_status);
                     $splittedstring_c = explode(',', $request->prop_status);
                     if (in_array('For Rent', $splittedstring) && in_array('Rented', $splittedstring_c)) {
-                        $to_date = !empty($prop_status_old->status_changed_on) ? $prop_status_old->status_changed_on : $prop_status_old->created_at;
+                        $to_date = ! empty($prop_status_old->status_changed_on) ? $prop_status_old->status_changed_on : $prop_status_old->created_at;
                         $to = Carbon::parse($to_date);
                         $from = Carbon::now()->format('Y-m-d H:i:s');
                         $days_on_market = $to->diffInDays($from);
 
-                        $tableArray['days_on_market'] = !empty($prop_status_old->days_on_market) ? $prop_status_old->days_on_market + $days_on_market : $days_on_market;
+                        $tableArray['days_on_market'] = ! empty($prop_status_old->days_on_market) ? $prop_status_old->days_on_market + $days_on_market : $days_on_market;
                         $tableArray['status_changed_on'] = now();
                     }
                     if (in_array('Rented', $splittedstring) && in_array('For Rent', $splittedstring_c)) {
@@ -712,13 +717,13 @@ class LeadsController extends Controller
             } else {
                 $prop_id = '';
             }
-            $tableArray['form_id']      = $form_id;
-            $tableArray['content']      = $request->desc;
-            $tableArray['st_address']   = $request->strata_property_details['address'];
-            $tableArray['country']      = $request->strata_property_details['country'];
-            $tableArray['state']        = $request->strata_property_details['state'];
-            $tableArray['city']         = $request->strata_property_details['city'];
-            $tableArray['zip']          = $request->strata_property_details['zip'];
+            $tableArray['form_id'] = $form_id;
+            $tableArray['content'] = $request->desc;
+            $tableArray['st_address'] = $request->strata_property_details['address'];
+            $tableArray['country'] = $request->strata_property_details['country'];
+            $tableArray['state'] = $request->strata_property_details['state'];
+            $tableArray['city'] = $request->strata_property_details['city'];
+            $tableArray['zip'] = $request->strata_property_details['zip'];
             if (isset($request->source) && $request->source == 'pma') {
                 $property = Property::updateOrCreate(['form_id' => $form_id], $tableArray);
                 PropertyManagementAgreementForm::find($form_id)->update(['pro_status' => 1]);
@@ -742,6 +747,7 @@ class LeadsController extends Controller
                 }
             }
             $data = PropertyManagementAgreementForm::find($form_id);
+
             return response()->json(['data' => $data, 'status' => 'created']);
         } else {
             $data = $property = [];
@@ -752,6 +758,7 @@ class LeadsController extends Controller
         }
         $ip = \Request::ip();
         $countries = Countries();
+
         return view('leads::property-form', compact('countries', 'account_id', 'data', 'property', 'ip'))->with('msg', 'inserted');
     }
 
@@ -761,17 +768,18 @@ class LeadsController extends Controller
         $allowedFileTypes = array_merge($allowedImageTypes, ['pdf']);
         $allowedTypes = ($type == 'property_photos') ? $allowedImageTypes : $allowedFileTypes;
         $fileExtension = strtolower($file->getClientOriginalExtension());
-        if (!in_array($fileExtension, $allowedTypes)) {
+        if (! in_array($fileExtension, $allowedTypes)) {
             Log::warning('Unsupported file type uploaded: ' . $fileExtension);
+
             return;
         }
 
         $baseDir = public_path('uploads/properties/' . $id . '/');
-        if (!File::isDirectory($baseDir)) {
+        if (! File::isDirectory($baseDir)) {
             File::makeDirectory($baseDir, 0777, true, true);
         }
         $typeDir = $baseDir . '/' . $type;
-        if (!File::isDirectory($typeDir)) {
+        if (! File::isDirectory($typeDir)) {
             File::makeDirectory($typeDir, 0777, true, true);
         }
         chmod($baseDir, 0777);
@@ -779,7 +787,7 @@ class LeadsController extends Controller
         $original = $typeDir . '/original';
 
         foreach ([$dirThumb, $original] as $directory) {
-            if (!File::isDirectory($directory)) {
+            if (! File::isDirectory($directory)) {
                 File::makeDirectory($directory, 0777, true, true);
             }
         }
@@ -787,7 +795,7 @@ class LeadsController extends Controller
         $fileName = generateFileName($file);
         if ($fileExtension == 'pdf') {
             $fileName = generateFileName($file);
-            if (!File::isDirectory($typeDir)) {
+            if (! File::isDirectory($typeDir)) {
                 File::makeDirectory($typeDir, 0777, true, true);
             }
             $file->move($typeDir, $fileName);
@@ -807,6 +815,7 @@ class LeadsController extends Controller
             'featured' => $featured,
         ];
         Media::create($attachArray);
+
         return $attachArray['url'];
     }
 
@@ -815,14 +824,16 @@ class LeadsController extends Controller
         if ($user_id) {
             $user_id = Crypt::decryptString($user_id);
             $isVerify = User::find($user_id)->email_verified_at;
-            if (!$isVerify || !Auth::check()) {
+            if (! $isVerify || ! Auth::check()) {
                 abort(401);
             }
-        } else if (Auth::check()) {
+        } elseif (Auth::check()) {
             $user_id = Crypt::encryptString(Auth::user()->id);
+
             return redirect()->route('pma.pmaRegisterForm', ['account_id' => $account_id, 'userId' => $user_id]);
         }
         $verify = $request->has('email') && $request->email == 'true' ? 'email' : 'direct';
+
         return view('leads::pmaRegister', compact('verify', 'user_id', 'account_id'));
     }
 
@@ -839,6 +850,7 @@ class LeadsController extends Controller
                     $message .= 'Please click on the link below to review and sign the agreement.<br>';
                     $message .= '<div style="text-align: center;"><a href="' . route('pma.pmaRegisterForm', ['account_id' => $request->account_id, 'userId' => Crypt::encryptString($userExist->id)]) . '" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: #fff; text-decoration: none; border-radius: 5px;">Fill Property Management Agreement</a></div>';
                     $userExist->notify(new LeadsFormNotification($userExist, $subject, $message));
+
                     return redirect()->route('pma.pmaRegisterFormSubmit')->with('response', 'IMPORTANT: VERIFY YOUR EMAIL ADDRESS!<br> Security is our top priority. To complete the signing process, please log in to the email address you provided in this form and click on the unique link to authenticate your signature.');
                 }
             } else {
@@ -862,7 +874,7 @@ class LeadsController extends Controller
                     'country' => $request->country ?? 'CA',
                     'type' => User::TYPE_USER,
                     'roles' => 'Property Owner',
-                    'password' => bcrypt($password)
+                    'password' => bcrypt($password),
                 ];
                 $createUser = $this->createUser($userData);
                 $account = User::where(['uuid' => $request->account_id])->first();
@@ -873,17 +885,17 @@ class LeadsController extends Controller
                         $adminObj = User::where(['uuid' => $request->account_id])->first();
                         if ($adminObj) {
                             $adminSubject = appName() . ' - New User Registered!';
-                            $adminTextBody  = 'We hope this message finds you well.<br>';
-                            $adminTextBody  .= 'A new user has registered on ' . appName() . '. Here are the details:<br>';
-                            $adminTextBody  .= '<strong> Name:    </strong>' . $createUser->name .  '<br>';
-                            $adminTextBody  .= '<strong> E-mail:  </strong>' . $createUser->email . '<br>';
-                            $adminTextBody  .= '<strong> Phone:   </strong>' . $createUser->phone . '<br>';
-                            $adminTextBody  .= '<strong> Country: </strong>' . $userData['country'];
+                            $adminTextBody = 'We hope this message finds you well.<br>';
+                            $adminTextBody .= 'A new user has registered on ' . appName() . '. Here are the details:<br>';
+                            $adminTextBody .= '<strong> Name:    </strong>' . $createUser->name .  '<br>';
+                            $adminTextBody .= '<strong> E-mail:  </strong>' . $createUser->email . '<br>';
+                            $adminTextBody .= '<strong> Phone:   </strong>' . $createUser->phone . '<br>';
+                            $adminTextBody .= '<strong> Country: </strong>' . $userData['country'];
                             $adminObj->notify(new LeadsFormNotification($adminObj, $adminSubject, $adminTextBody));
                         }
 
-                        $subject  = appName() . ' - Property Management Agreement Confirmation';
-                        $message  = 'We hope this message finds you well.<br>';
+                        $subject = appName() . ' - Property Management Agreement Confirmation';
+                        $message = 'We hope this message finds you well.<br>';
                         $message .= 'Thank you for verifying your email!<br>';
                         $message .= 'Please click on the link below to review and sign the agreement.<br>';
                         $message .= '<div style="text-align: center;"><a href="' . route('pma.pmaRegisterForm', ['account_id' => $request->account_id, 'userId' => Crypt::encryptString($createUser->id)]) . '" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: #fff; text-decoration: none; border-radius: 5px;">Fill Property Management Agreement</a></div><br>';
@@ -892,6 +904,7 @@ class LeadsController extends Controller
                         Log::error($e);
                     }
                 }
+
                 return redirect()->route('pma.pmaRegisterForm', ['account_id' => $request->account_id])->with('response', 'Thank you! We have just sent you a confirmation email with the Property Management Agreement form link. Please check your Inbox or Spam folder if you have not received any confirmation.');
             }
         } elseif (isset($request->user_id, $request->owners)) {
@@ -900,6 +913,7 @@ class LeadsController extends Controller
             } elseif ($request->owners == '2' && $request->ap == '1' && $request->email2 !== '') {
                 $url = route('pma.form', ['account_id' => $request->account_id, 'owners' => $request->owners, 'ap' => $request->ap, 'email2' => Crypt::encrypt($request->email2)]);
             }
+
             return redirect($url ?? route('pma.pmaRegisterForm', ['account_id' => $request->account_id]));
         }
     }
@@ -928,10 +942,10 @@ class LeadsController extends Controller
         if ($action === 'view') {
             $formId = Crypt::decryptString($request->form_id);
             $data = PropertyManagementAgreementForm::find($formId);
-        } elseif (!empty($formId)) {
+        } elseif (! empty($formId)) {
             $data = PropertyManagementAgreementForm::where(['id' => Crypt::decryptString($formId)])->first();
             $accessToken = $request->access_key;
-            if (!$data) {
+            if (! $data) {
                 $linkAccessible = false;
             }
         }
@@ -953,11 +967,11 @@ class LeadsController extends Controller
         if ($action === 'view') {
             $formId = Crypt::decryptString($request->form_id);
             $data = PropertyManagementAgreementForm::find($formId);
-        } elseif (!empty($request->form_id)) {
+        } elseif (! empty($request->form_id)) {
             $formId = $request->form_id;
             $data = PropertyManagementAgreementForm::where(['id' => $formId, 'access_token' => $request->access_key])->first();
             $accessToken = $request->access_key;
-            if (!$data) {
+            if (! $data) {
                 $linkAccessible = false;
             }
         } else {
@@ -966,6 +980,7 @@ class LeadsController extends Controller
                 $user = User::find($id);
             }
         }
+
         return view('leads::pmaForm', compact('countries', 'accessToken', 'action', 'data', 'ip', 'linkAccessible', 'owners', 'ap', 'email2', 'agentPmaId', 'user', 'account_id'));
     }
 
@@ -979,17 +994,18 @@ class LeadsController extends Controller
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
-        $user = new User;
+        $user = new User();
         $user->name = $request->name;
         $user->email = $request->email;
 
-        $subject  = appName() . ' - Property Management Agreement';
-        $message  = 'We hope this message finds you well.<br>';
+        $subject = appName() . ' - Property Management Agreement';
+        $message = 'We hope this message finds you well.<br>';
         $message .= 'Thank you for verifying your email!<br>';
         $message .= 'Please click on the link below to review and sign the agreement.<br>';
-        $message .= '<div style="text-align: center;"><a href="' . route('pma.pmaRegisterForm', ['account_id' =>  Auth::user()->uuid]) . '" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: #fff; text-decoration: none; border-radius: 5px;">Fill Property Management Agreement</a></div><br>';
+        $message .= '<div style="text-align: center;"><a href="' . route('pma.pmaRegisterForm', ['account_id' => Auth::user()->uuid]) . '" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: #fff; text-decoration: none; border-radius: 5px;">Fill Property Management Agreement</a></div><br>';
 
         $user->notify(new LeadsFormNotification($user, $subject, $message));
+
         return back()->withFlashSuccess(__('Propert Management Form Send Successfully.'));
     }
 }

@@ -3,17 +3,17 @@
 namespace Modules\Property\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Modules\Property\Entities\ShowingApplication;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\HtmlString;
-
+use Modules\Property\Entities\ShowingApplication;
 
 class ShowingRequestNotification extends Notification
 {
     use Queueable;
-    public $applicationData, $body, $subject;
+    public $applicationData;
+    public $body;
+    public $subject;
 
     /**
      * Create a new notification instance.
@@ -49,7 +49,8 @@ class ShowingRequestNotification extends Notification
         $agentName = optional($this->applicationData->agent)->first_name ?? 'Agent';
         $subject = $this->subject ?? 'Default Subject';
         $greeting = 'Hello ' . $agentName;
-        return (new MailMessage)->subject($subject)->greeting($greeting)->line(new HtmlString($this->body));
+
+        return (new MailMessage())->subject($subject)->greeting($greeting)->line(new HtmlString($this->body));
     }
 
     /**

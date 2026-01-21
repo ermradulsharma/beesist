@@ -3,15 +3,20 @@
 namespace Modules\RentalApplication\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\HtmlString;
 
 class LandlordApplicationVerification extends Notification
 {
     use Queueable;
-    public $landlordObj, $type, $subject, $text_body, $text_body2, $application_id;
+    public $landlordObj;
+    public $type;
+    public $subject;
+    public $text_body;
+    public $text_body2;
+    public $application_id;
+
     /**
      * Create a new notification instance.
      *
@@ -49,7 +54,7 @@ class LandlordApplicationVerification extends Notification
         $refernceName = ($this->type == 'landlord') ? $this->landlordObj['landlord_name'] : $this->landlordObj['employer_name'];
         $refernceAddress = ($this->type == 'landlord') ? $this->landlordObj['property_address'] : $this->landlordObj['employment_address'];
 
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject($this->subject)
             ->greeting('Hello ' . $refernceName  . ',')
             ->line(new HtmlString($this->text_body))

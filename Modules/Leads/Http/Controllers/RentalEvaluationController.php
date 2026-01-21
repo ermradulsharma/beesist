@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Models\RentalEvaluation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Modules\Cms\Entities\EmailTemplate;
 use Modules\Leads\Notifications\RentalEvaluationNotification;
@@ -32,7 +31,7 @@ class RentalEvaluationController extends Controller
             $content = str_replace("[LOGO]", $logo, $request->content);
             $subject = str_replace("[address]", $request->address, $request->subject);
             $user = User::where('email', $request->recipient)->first();
-            if (!$user) {
+            if (! $user) {
                 $user = new User();
                 $user->email = $request->recipient;
                 $user->name = $request->name;
@@ -43,6 +42,7 @@ class RentalEvaluationController extends Controller
                 ['id' => $request->id, 'first_name' => $request->name, 'email' => $request->recipient, 'address' => $request->address, 'unit_no' => $request->listing_number],
                 ['account_id' => $accountId, 'name' => $request->name, 'email' => $request->recipient, 'phone' => $request->phone, 'address' => $request->address, 'unit_no' => $request->listing_number, 'bedrooms' => $request->beds, 'bathrooms' => $request->baths, 'square_footage' => $request->area, 'status' => '1']
             );
+
             return redirect()->route(rolebased() . '.rental_evaluation.index')->withFlashSuccess('Rental Evalution Report Sent Successfully');
         }
         $address = $listing_number = $beds = $baths = $area = $rate = $name = $email = $phone = $req_id = $subject = $content = '';

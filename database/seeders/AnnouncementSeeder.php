@@ -12,7 +12,8 @@ use Illuminate\Database\Seeder;
  */
 class AnnouncementSeeder extends Seeder
 {
-    use DisableForeignKeys, TruncateTable;
+    use DisableForeignKeys;
+    use TruncateTable;
 
     /**
      * Run the database seeds.
@@ -50,7 +51,7 @@ class AnnouncementSeeder extends Seeder
                 'message' => 'This announcement will be shown because the current time falls between the start and end dates.',
                 'enabled' => true,
                 'starts_at' => now()->subWeek(),
-                'ends_at' => now()->addWeek()
+                'ends_at' => now()->addWeek(),
             ]);
             Announcement::create([
                 'area' => null,
@@ -63,7 +64,7 @@ class AnnouncementSeeder extends Seeder
                 'type' => 'danger',
                 'message' => 'This announcement will not be shown because the end date has passed.',
                 'enabled' => true,
-                'ends_at' => now()->subDay()
+                'ends_at' => now()->subDay(),
             ]);
             Announcement::create([
                 'area' => null,
@@ -71,7 +72,7 @@ class AnnouncementSeeder extends Seeder
                 'message' => 'This announcement will not be shown because the current time does not fall between the start and end dates.',
                 'enabled' => true,
                 'starts_at' => now()->subWeek(),
-                'ends_at' => now()->subDay()
+                'ends_at' => now()->subDay(),
             ]);
         }
 

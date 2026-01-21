@@ -11,7 +11,7 @@ use Illuminate\Queue\SerializesModels;
 class RoleCreated
 {
     use SerializesModels;
-    
+
     public $role;
 
     public function __construct(Role $role)

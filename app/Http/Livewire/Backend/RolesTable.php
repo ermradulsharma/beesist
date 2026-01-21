@@ -3,10 +3,6 @@
 namespace App\Http\Livewire\Backend;
 
 use App\Domains\Auth\Models\Role;
-use App\Domains\Auth\Models\Traits\Attribute\RoleAttribute;
-use App\Domains\Auth\Models\Traits\Attribute\UserAttribute;
-use App\Domains\Auth\Models\Traits\Relationship\PermissionRelationship;
-use App\Domains\Auth\Models\Traits\Relationship\UserRelationship;
 use DB;
 use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
@@ -25,6 +21,7 @@ class RolesTable extends DataTableComponent
     {
         $this->setPrimaryKey('id');
     }
+
     public function query(): Builder
     {
         $query = Role::with('users')->select('id', 'type', 'name');
@@ -36,9 +33,9 @@ class RolesTable extends DataTableComponent
                     ->orWhere('name', 'LIKE', $searchTerm);
             });
         }
+
         return $query;
     }
-
 
     public function columns(): array
     {

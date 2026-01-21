@@ -4,9 +4,11 @@ namespace App\Console\Commands;
 
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Artisan;
 use Modules\Cms\Entities\EmailTemplate;
 use Modules\Leads\Entities\PropertyManagementAgreementForm;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PmaNotification;
+use App\Notification;
 
 class Insurance extends Command
 {
@@ -42,6 +44,7 @@ class Insurance extends Command
     public function handle()
     {
         $forms = PropertyManagementAgreementForm::with('user')->select('id', 'user_id', 'n_own', 'won2_email', 'fName_1', 'lName_2', 'phone_4', 'email_5', 'dob_8', 'address_10', 'status', 'created_at')->where('notify_status', '3')->whereBetween('created_at', [Carbon::now()->subDays(3), Carbon::now()->subDays(2)])->get();
+        $email_data = EmailTemplate::where('title', 'INSURANCE')->first();
         if ($email_data->status == '1') {
             $additional = PropertyManagementAgreementForm::select('id', 'user_id', 'n_own', 'won2_email', 'fName_1', 'lName_2', 'phone_4', 'email_5', 'dob_8', 'address_10', 'status', 'created_at')->whereIn('user_id', explode(',', $email_data->other_reciepients))->with('user')->get();
             $forms = $forms->merge($additional);

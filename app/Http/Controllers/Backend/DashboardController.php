@@ -2,10 +2,7 @@
 
 namespace App\Http\Controllers\Backend;
 
-use App\Models\PmaForm;
-use App\Models\Property;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\File;
 use Image;
 

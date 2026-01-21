@@ -19,4 +19,3 @@ class PropertyReportFactory extends Factory
         return [];
     }
 }
-

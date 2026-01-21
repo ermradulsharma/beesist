@@ -2,8 +2,14 @@
 
 namespace App\Console\Commands;
 
+use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Mail;
+use App\Notification;
+use App\QuoteRequests;
+use App\Domains\Auth\Models\User;
+use Modules\Cms\Entities\EmailTemplate;
+use App\Mail\GetQuoteNotification;
 
 class EngagementEmail2 extends Command
 {
@@ -39,7 +45,7 @@ class EngagementEmail2 extends Command
     public function handle()
     {
         $quotes = QuoteRequests::where('notify_status', '2')->whereDate('created_at', '<', Carbon::now()->subDays(3)->format('Y-m-d'))->get();
-        $email_data = \App\EmailTemplate::where('title', 'ENGAGEMENT EMAIL 2')->first();
+        $email_data = EmailTemplate::where('title', 'ENGAGEMENT EMAIL 2')->first();
         if ($email_data->status == '1') {
             $additional = User::whereIn('id', explode(',', $email_data->other_reciepients))->get();
 

@@ -13,7 +13,9 @@ use Illuminate\Support\Str;
 
 class ServiceSeeder extends Seeder
 {
-    use DisableForeignKeys, TruncateTable;
+    use DisableForeignKeys;
+    use TruncateTable;
+
     /**
      * Run the database seeds.
      *
@@ -93,15 +95,19 @@ class ServiceSeeder extends Seeder
                 switch ($package['title']) {
                     case 'Bronze':
                         $packageServices = $bronzeService;
+
                         break;
                     case 'Silver':
                         $packageServices = $silverService;
+
                         break;
                     case 'Gold':
                         $packageServices = $goldService;
+
                         break;
                     case 'Platinum':
                         $packageServices = $platinumService;
+
                         break;
                 }
                 foreach ($packageServices as $service) {
@@ -125,7 +131,7 @@ class ServiceSeeder extends Seeder
                     'description' => $packageObj->description,
                     'metadata' => [
                         'property_limit' => (string)$packageObj->total_property_limit,
-                        'features' => json_encode($features)
+                        'features' => json_encode($features),
                     ],
                 ]);
 
@@ -139,7 +145,7 @@ class ServiceSeeder extends Seeder
                 ]);
                 $packageObj->update([
                     'stripe_product_id' => $product->id,
-                    'stripe_price_id' => $price->id
+                    'stripe_price_id' => $price->id,
                 ]);
             }
         }

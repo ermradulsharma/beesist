@@ -4,9 +4,11 @@ namespace App\Console\Commands;
 
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Artisan;
 use Modules\Cms\Entities\EmailTemplate;
 use Modules\Leads\Entities\PropertyManagementAgreementForm;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PmaNotification;
+use App\Notification;
 
 class PropertyInfo extends Command
 {

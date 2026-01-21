@@ -53,6 +53,7 @@ class UserService extends BaseService
     public function registerUser(array $data = []): User
     {
         DB::beginTransaction();
+
         try {
             $user = $this->createUser($data);
             $user->syncRoles($data['roles'] ?? []);
@@ -60,6 +61,7 @@ class UserService extends BaseService
             DB::commit();
         } catch (Exception $e) {
             DB::rollBack();
+
             throw new GeneralException(__('There was a problem creating your account.'));
         }
 
@@ -76,6 +78,7 @@ class UserService extends BaseService
         $user = $this->model::where('provider_id', $info->id)->first();
         if (! $user) {
             DB::beginTransaction();
+
             try {
                 $user = $this->createUser([
                     'first_name' => $info->first_name ?? '',
@@ -89,6 +92,7 @@ class UserService extends BaseService
                 DB::commit();
             } catch (Exception $e) {
                 DB::rollBack();
+
                 throw new GeneralException(__('There was a problem connecting to :provider', ['provider' => $provider]));
             }
         }
@@ -142,6 +146,7 @@ class UserService extends BaseService
         } catch (Exception $e) {
             Log::error($e->getMessage().'line No '.$e->getLine());
             DB::rollBack();
+
             throw new GeneralException(__('There was a problem creating this user. Please try again.'));
         }
 
@@ -153,6 +158,7 @@ class UserService extends BaseService
     public function update(User $user, array $data = []): User
     {
         DB::beginTransaction();
+
         try {
             $user->update([
                 // 'type' => $user->isMasterAdmin() ? $this->model::TYPE_ADMIN : ($data['type'] ?? $user->type),
@@ -170,6 +176,7 @@ class UserService extends BaseService
         } catch (Exception $e) {
             DB::rollBack();
             Log::error($e->getMessage());
+
             throw new GeneralException(__('There was a problem updating this user. Please try again.'));
         }
         event(new UserUpdated($user));
@@ -227,6 +234,7 @@ class UserService extends BaseService
 
             return $user;
         }
+
         throw new GeneralException(__('There was a problem updating this user. Please try again.'));
     }
 
@@ -243,6 +251,7 @@ class UserService extends BaseService
 
             return $user;
         }
+
         throw new GeneralException('There was a problem deleting this user. Please try again.');
     }
 
@@ -256,6 +265,7 @@ class UserService extends BaseService
 
             return $user;
         }
+
         throw new GeneralException(__('There was a problem restoring this user. Please try again.'));
     }
 
@@ -269,6 +279,7 @@ class UserService extends BaseService
 
             return true;
         }
+
         throw new GeneralException(__('There was a problem permanently deleting this user. Please try again.'));
     }
 
@@ -278,6 +289,7 @@ class UserService extends BaseService
     public function profileImage(User $user, array $data = []): bool
     {
         DB::beginTransaction();
+
         try {
             if (isset($data['profilImg']) && $data['profilImg']->isValid()) {
                 $directory = 'uploads/profile/'.$user->id.'/';
@@ -300,6 +312,7 @@ class UserService extends BaseService
         } catch (\Exception $th) {
             Log::error($e->getMessage().'line No '.$e->getLine());
             DB::rollBack();
+
             throw new GeneralException(__('There was a problem creating this user. Please try again.'));
         }
 

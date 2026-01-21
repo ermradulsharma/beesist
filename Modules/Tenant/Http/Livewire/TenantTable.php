@@ -2,10 +2,9 @@
 
 namespace Modules\Tenant\Http\Livewire;
 
-
-use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Illuminate\Database\Eloquent\Builder;
 use Modules\Tenant\Entities\Tenant;
+use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 
@@ -27,9 +26,10 @@ class TenantTable extends DataTableComponent
             'message' => 'Comming Soon!',
             'text' => '',
             'function' => '',
-            'id' =>'',
+            'id' => '',
         ]);
     }
+
     public function confirmDeclined($id)
     {
         $this->dispatchBrowserEvent('swal:confirmed', [
@@ -123,6 +123,7 @@ class TenantTable extends DataTableComponent
                     ['action' => 'confirmDeclined', 'href' => 'javascript:void(0)', 'btn' => 'danger', 'title' => 'Decline', 'icon' => 'times'],
                     ['action' => 'confirmDelete', 'href' => 'javascript:void(0)', 'btn' => 'danger', 'title' => 'Remove Request', 'icon' => 'trash'],
                 ];
+
                 return view('tenant::partial._action', ['model' => $row, 'actions' => $action]);
             })->html(),
             Column::make(__('Name'), 'userDetails.name')->sortable(),
@@ -134,6 +135,7 @@ class TenantTable extends DataTableComponent
                 $status = $row->status;
                 $text = $status == 0 ? 'warning' : ($status == 1 ? 'success' : 'danger');
                 $title = $status == 0 ? 'Pendding' : ($status == 1 ? 'Approved' : 'Rejected');
+
                 return '<i class="text-' . $text . ' fas fa-circle" style="font-size: 10px;" data-toggle="tooltip" title="' . $title . '"></i>';
             })->html(),
             Column::make(__('Date'), 'created_at')->sortable(),

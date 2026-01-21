@@ -13,11 +13,11 @@ class AddTimezoneColumnToUsersTable extends Migration
     public function up()
     {
         $column = config('timezone.column_name', 'timezone');
-        if (!Schema::hasColumn('users', $column)) {
+        if (! Schema::hasColumn('users', $column)) {
             Schema::table('users', function (Blueprint $table) use ($column) {
                 $table->string($column)->after('remember_token')->nullable();
             });
-        } 
+        }
     }
 
     /**

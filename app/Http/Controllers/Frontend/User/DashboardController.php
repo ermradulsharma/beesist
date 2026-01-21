@@ -16,6 +16,7 @@ class DashboardController
     {
         $user = Auth::user();
         $role = $user->roles[0]['name'] ?? 'Undefined';
+
         return view('frontend.user.dashboard', compact('user', 'role'));
     }
 }

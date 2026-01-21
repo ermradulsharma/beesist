@@ -3,7 +3,6 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\HtmlString;
@@ -12,7 +11,6 @@ class SendVerificationCodeNotification extends Notification
 {
     use Queueable;
     public $data;
-
 
     /**
      * Create a new notification instance.
@@ -43,7 +41,7 @@ class SendVerificationCodeNotification extends Notification
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject($this->data['subject'])
             ->greeting('Hello')
             ->line(new HtmlString($this->data['message']));

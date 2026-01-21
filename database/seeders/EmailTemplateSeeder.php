@@ -2,15 +2,16 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use Database\Seeders\Traits\DisableForeignKeys;
 use Database\Seeders\Traits\TruncateTable;
+use Illuminate\Database\Seeder;
 use Modules\Cms\Entities\EmailTemplate;
 
 class EmailTemplateSeeder extends Seeder
 {
-    use DisableForeignKeys, TruncateTable;
+    use DisableForeignKeys;
+    use TruncateTable;
+
     /**
      * Run the database seeds.
      */
@@ -70,7 +71,7 @@ class EmailTemplateSeeder extends Seeder
                     <h4><strong>All fees are payable only when your property is rented. There are no hidden fees or extra charges.</strong></h4>
                     <p>Usually the last week of previous month and the first week of the month prior to the desired tenant placement date are the best times to find a prospective tenant. In case that you are planning to rent your property within 1 month, it is crucial to start advertising as soon as possible.</p>',
                 'command' => null,
-                'other_reciepients' => NULL,
+                'other_reciepients' => null,
                 'role' => 'Property Owner',
                 'notify_trigger' => null,
             ],
@@ -201,7 +202,7 @@ class EmailTemplateSeeder extends Seeder
                 'title' => 'SETUP OWNER',
                 'slug' => 'setup-owner',
                 'subject' => 'SETUP OWNER - ' . appName() . ' Property Management',
-                'scheduled_time' => NULL,
+                'scheduled_time' => null,
                 'schedule_desc' => 'After 1 hour of PMA submission',
                 'content' => '
                     <table width="100%" cellspacing="0" cellpadding="0">
@@ -274,7 +275,7 @@ class EmailTemplateSeeder extends Seeder
                         </tbody>
                     </table>',
                 'command' => 'owner:setupowner',
-                'other_reciepients' => NULL,
+                'other_reciepients' => null,
                 'role' => 'Admin',
                 'notify_trigger' => 'After PMA',
             ],
@@ -282,7 +283,7 @@ class EmailTemplateSeeder extends Seeder
                 'title' => 'WELCOME',
                 'slug' => 'welcome',
                 'subject' => 'WELCOME - ' . appName() . ' Property Management',
-                'scheduled_time' => NULL,
+                'scheduled_time' => null,
                 'schedule_desc' => 'After 1 day of PMA submission',
                 'content' => '
                     <table style="height: 805px; width: 100%;" width="100%" cellspacing="0" cellpadding="0">
@@ -365,7 +366,7 @@ class EmailTemplateSeeder extends Seeder
                         </tbody>
                     </table>',
                 'command' => 'owner:welcome',
-                'other_reciepients' => NULL,
+                'other_reciepients' => null,
                 'role' => 'Property Owner',
                 'notify_trigger' => 'After PMA',
             ],
@@ -373,7 +374,7 @@ class EmailTemplateSeeder extends Seeder
                 'title' => 'INSURANCE',
                 'slug' => 'insurance',
                 'subject' => 'INSURANCE - ' . appName() . ' Property Management',
-                'scheduled_time' => NULL,
+                'scheduled_time' => null,
                 'schedule_desc' => 'After 2 day of PMA submission',
                 'content' => '
                     <table style="width: 100%;" width="100%" cellspacing="0" cellpadding="0">
@@ -410,7 +411,7 @@ class EmailTemplateSeeder extends Seeder
                         </tbody>
                     </table>',
                 'command' => 'owner:insurance',
-                'other_reciepients' => NULL,
+                'other_reciepients' => null,
                 'role' => 'Property Owner',
                 'notify_trigger' => 'After PMA',
             ],
@@ -418,7 +419,7 @@ class EmailTemplateSeeder extends Seeder
                 'title' => 'SURVEY',
                 'slug' => 'survey',
                 'subject' => 'SURVEY - ' . appName() . ' Property Management',
-                'scheduled_time' => NULL,
+                'scheduled_time' => null,
                 'schedule_desc' => 'After 3 day of PMA submission',
                 'content' => '
                     <table style="width: 100%;" width="100%" cellspacing="0" cellpadding="0">
@@ -472,7 +473,7 @@ class EmailTemplateSeeder extends Seeder
                         </tbody>
                     </table>',
                 'command' => 'owner:survey',
-                'other_reciepients' => NULL,
+                'other_reciepients' => null,
                 'role' => 'Property Owner',
                 'notify_trigger' => 'After PMA',
             ],
@@ -480,7 +481,7 @@ class EmailTemplateSeeder extends Seeder
                 'title' => 'REFER US',
                 'slug' => 'refer-us',
                 'subject' => 'REFER US - ' . appName() . ' Property Management',
-                'scheduled_time' => NULL,
+                'scheduled_time' => null,
                 'schedule_desc' => 'After 4 day of PMA submission',
                 'content' => '
                     <table style="width: 100%;" width="100%" cellspacing="0" cellpadding="0">
@@ -532,7 +533,7 @@ class EmailTemplateSeeder extends Seeder
                         </tbody>
                     </table>',
                 'command' => 'owner:reffer',
-                'other_reciepients' => NULL,
+                'other_reciepients' => null,
                 'role' => 'Property Owner',
                 'notify_trigger' => 'After PMA',
             ],
@@ -540,7 +541,7 @@ class EmailTemplateSeeder extends Seeder
                 'title' => 'TENANT SHOWING DATE 8:00 AM',
                 'slug' => 'tenant-showing-date-800-am',
                 'subject' => 'Before showing Tenant Notifications',
-                'scheduled_time' => NULL,
+                'scheduled_time' => null,
                 'schedule_desc' => '8 am the day of the showing',
                 'content' => '
                     <table style="width: 100%;" width="100%" cellspacing="0" cellpadding="0">
@@ -568,7 +569,7 @@ class EmailTemplateSeeder extends Seeder
                         <img src="https://forrentcentral.com/img/email/Disclosure-for-Residential-Tenancies_Page_2.jpg" alt="Disclosure for Residential Tenancies pg 2">
                     </p>',
                 'command' => 'tenant:showing_date_first',
-                'other_reciepients' => NULL,
+                'other_reciepients' => null,
                 'role' => 'Tenant',
                 'notify_trigger' => 'Before Showing Date at 8:00 AM',
             ],
@@ -576,7 +577,7 @@ class EmailTemplateSeeder extends Seeder
                 'title' => 'TENANT BEFORE 2H OF SHOWING',
                 'slug' => 'tenant-before-2h-of-showing',
                 'subject' => 'Before 2hours of showing Tenant Notifications',
-                'scheduled_time' => NULL,
+                'scheduled_time' => null,
                 'schedule_desc' => 'Before 2hours of showing',
                 'content' => '
                     <table style="width: 100%;" width="100%" cellspacing="0" cellpadding="0">
@@ -600,7 +601,7 @@ class EmailTemplateSeeder extends Seeder
                         </tbody>
                     </table>',
                 'command' => 'tenant:showing_date_second',
-                'other_reciepients' => NULL,
+                'other_reciepients' => null,
                 'role' => 'Tenant',
                 'notify_trigger' => 'Before 2hours of showing time',
             ],
@@ -608,7 +609,7 @@ class EmailTemplateSeeder extends Seeder
                 'title' => 'SHOWING FOLLOW UP',
                 'slug' => 'showing-follow-up',
                 'subject' => 'Thank you for attending the showing',
-                'scheduled_time' => NULL,
+                'scheduled_time' => null,
                 'schedule_desc' => 'Wait at least 1 hour and then run between 6:00 PM - 7:30 PM',
                 'content' => '
                     <table style="width: 100%;" width="100%" cellspacing="0" cellpadding="0">
@@ -668,7 +669,7 @@ class EmailTemplateSeeder extends Seeder
                         </tbody>
                     </table>',
                 'command' => 'tenant:showing_follow_up',
-                'other_reciepients' => NULL,
+                'other_reciepients' => null,
                 'role' => 'Tenant',
                 'notify_trigger' => 'After 1 hour of showing',
             ],
@@ -676,7 +677,7 @@ class EmailTemplateSeeder extends Seeder
                 'title' => 'SHOWING SURVEY',
                 'slug' => 'showing-survey',
                 'subject' => 'Rate your showing experience',
-                'scheduled_time' => NULL,
+                'scheduled_time' => null,
                 'schedule_desc' => 'Wait at least 5 minutes and then run at any time',
                 'content' => '
                     <table style="width: 100%;" width="100%" cellspacing="0" cellpadding="0">
@@ -714,7 +715,7 @@ class EmailTemplateSeeder extends Seeder
                         </tbody>
                     </table>',
                 'command' => 'tenant:showing_survey',
-                'other_reciepients' => NULL,
+                'other_reciepients' => null,
                 'role' => 'Tenant',
                 'notify_trigger' => 'After 5 min of Showing follow up',
             ],
@@ -812,7 +813,7 @@ class EmailTemplateSeeder extends Seeder
                         </tbody>
                     </table>',
                 'command' => 'get_quote:service_info_package',
-                'other_reciepients' => NULL,
+                'other_reciepients' => null,
                 'role' => 'Get A Quote',
                 'notify_trigger' => 'Within 5 Min of Get a Quote Request',
             ],
@@ -860,7 +861,7 @@ class EmailTemplateSeeder extends Seeder
                         </tbody>
                     </table>',
                 'command' => 'get_quote:engagement_email1',
-                'other_reciepients' => NULL,
+                'other_reciepients' => null,
                 'role' => 'Get A Quote',
                 'notify_trigger' => 'After 2 days at 8:00 AM',
             ],
@@ -926,7 +927,7 @@ class EmailTemplateSeeder extends Seeder
                         </tbody>
                     </table>',
                 'command' => 'get_quote:engagement_email2',
-                'other_reciepients' => NULL,
+                'other_reciepients' => null,
                 'role' => 'Get A Quote',
                 'notify_trigger' => 'After 2 Days of ENGAGEMENT EMAIL 1',
             ],
@@ -974,7 +975,7 @@ class EmailTemplateSeeder extends Seeder
                     </tbody>
                 </table>',
                 'command' => 'get_quote:consult_request',
-                'other_reciepients' => NULL,
+                'other_reciepients' => null,
                 'role' => 'Get A Quote',
                 'notify_trigger' => 'After 1 week of ENGAGEMENT EMAIL 2',
             ],
@@ -1052,7 +1053,7 @@ class EmailTemplateSeeder extends Seeder
                         </tbody>
                     </table>',
                 'command' => 'get_quote:service_info_package',
-                'other_reciepients' => NULL,
+                'other_reciepients' => null,
                 'role' => 'Get A Quote',
                 'notify_trigger' => 'Within 5 Min of Get a Quote Request',
             ],
@@ -1100,7 +1101,7 @@ class EmailTemplateSeeder extends Seeder
                         </tbody>
                     </table>',
                 'command' => 'owner:yourrentalevaluationready',
-                'other_reciepients' => NULL,
+                'other_reciepients' => null,
                 'role' => 'Property Owner',
                 'notify_trigger' => 'After Rental Evaluation Submission',
             ],
@@ -1108,7 +1109,7 @@ class EmailTemplateSeeder extends Seeder
                 'title' => 'WELCOME EMAIL',
                 'slug' => 'welcome-email',
                 'subject' => 'Welcome to your new home!',
-                'scheduled_time' => NULL,
+                'scheduled_time' => null,
                 'schedule_desc' => 'After 1 day of TA completion',
                 'content' => '
                     <p><img src="https://forrentcentral.com/images/Beesist-Logo.png" width="179" height="62" align="right"></p>
@@ -1211,7 +1212,7 @@ class EmailTemplateSeeder extends Seeder
                     <p>T- 1 (855) 266-8588</p>
                     <p><a href="mailto:info@forrentcentral.ca">info@forrentcentral.ca</a></p>',
                 'command' => 'tenant:welcome email',
-                'other_reciepients' => NULL,
+                'other_reciepients' => null,
                 'role' => 'Tenant',
                 'notify_trigger' => 'After TA',
             ],
@@ -1220,7 +1221,7 @@ class EmailTemplateSeeder extends Seeder
                 'slug' => 'rental-evaluation-welcome',
                 'subject' => 'Rental Evaluation ([ADDRESS]) Rent For Central Real Estate Management',
                 'scheduled_time' => 'After Sending Rental Evaluation Request',
-                'schedule_desc' => NULL,
+                'schedule_desc' => null,
                 'content' => '
                     <p>Your rental evaluation request has been received!</p>
                     <p>We will conduct a comparative market analysis. We compare your rental property with similar properties currently available in the area where your property is located.</p>
@@ -1265,10 +1266,10 @@ class EmailTemplateSeeder extends Seeder
                     </ul>
                     <h4><strong>All fees are payable only when your property is rented. There are no hidden fees or extra charges.</strong></h4>
                     <p>Usually the last week of previous month and the first week of the month prior to the desired tenant placement date are the best times to find a prospective tenant. In case that you are planning to rent your property within 1 month, it is crucial to start advertising as soon as possible.</p>',
-                'command' => NULL,
-                'other_reciepients' => NULL,
+                'command' => null,
+                'other_reciepients' => null,
                 'role' => 'Property Owner',
-                'notify_trigger' => NULL,
+                'notify_trigger' => null,
             ],
         ];
 

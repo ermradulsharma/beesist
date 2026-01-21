@@ -2,10 +2,13 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use Carbon\Carbon;
+use Illuminate\Console\Command;
 use Modules\Cms\Entities\EmailTemplate;
 use Modules\Leads\Entities\PropertyManagementAgreementForm;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PmaNotification;
+use App\Notification;
 
 class Survey extends Command
 {

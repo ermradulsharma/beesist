@@ -25,4 +25,3 @@ class PropertyQuestionFactory extends Factory
         ];
     }
 }
-

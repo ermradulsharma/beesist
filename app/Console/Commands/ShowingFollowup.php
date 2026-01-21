@@ -4,9 +4,11 @@ namespace App\Console\Commands;
 
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Crypt;
 use Modules\Cms\Entities\EmailTemplate;
 use Modules\Property\Entities\ShowingApplication;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ShowingNotification;
+use App\Notification;
 
 class ShowingFollowup extends Command
 {

@@ -72,11 +72,12 @@ class UserController
     {
         $routeName = Auth::user()->hasAllAccess() ? 'user' : 'agent';
         $requestData = $request->validated();
-        if(Auth::user()->hasManagerAccess()){
+        if (Auth::user()->hasManagerAccess()) {
             $requestData['type'] = 'user';
             $requestData['roles'] = ['Agent'];
         }
         $user = $this->userService->store($requestData);
+
         return redirect()->route(rolebased() . '.auth.' . $routeName . '.show', $user)->withFlashSuccess(__('The user was successfully created.'));
     }
 
@@ -109,6 +110,7 @@ class UserController
     {
         $routeName = Auth::user()->hasAllAccess() ? 'user' : 'agent';
         $this->userService->update($user, $request->validated());
+
         return redirect()->route(rolebased() . '.auth.' . $routeName . '.show', $user)->withFlashSuccess(__('The user was successfully updated.'));
     }
 
@@ -121,6 +123,7 @@ class UserController
     {
         $routeName = Auth::user()->hasAllAccess() ? 'user' : 'agent';
         $this->userService->delete($user);
+
         return redirect()->route(rolebased() . '.auth.' . $routeName . '.deleted')->withFlashSuccess(__('The user was successfully deleted.'));
     }
 
@@ -129,6 +132,7 @@ class UserController
         $authUser = Auth::user();
         $routeName = $authUser->hasAllAccess() ? 'user' : 'agent';
         $this->userService->profileImage($user, $request->validated());
+
         return back()->withUser($user)->withFlashSuccess(__('The user was successfully upload Profile.'));
     }
 }

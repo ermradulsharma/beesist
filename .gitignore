@@ -1,46 +1,60 @@
-/coverage
+# Beesist - .gitignore
+
+# --- Core Laravel ---
+/vendor
 /node_modules
 /public/storage
+/public/hot
 /public/mix-manifest.json
-/public/uploads
 /storage/*.key
-/vendor
-docker
-/.vscode
-*.sublime-project
-*.sublime-workspace
-_ide_helper.php
-.DS_Store
+/storage/debugbar
 .env
 .env.backup
-.idea
-.php_cs.cache
+.env.production
 .phpunit.result.cache
-.phpstorm.meta.php
-.project
-composer.phar
+/coverage
 coverage.xml
-docker-compose.override.yml
+
+# --- Modules & Plugins ---
+/Modules/*/assets
+modules_statuses.json
+
+# --- IDE Helper / Tooling ---
+.phpstorm.meta.php
+_ide_helper.php
+_ide_helper_models.php
+.php-cs-fixer.cache
+.php_cs.cache
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# --- OS Specific ---
+.DS_Store
+Thumbs.db
+
+# --- Build & Logs ---
+npm-debug.log
+yarn-error.log
 error.log
+/public/uploads/*
+!/public/uploads/.gitkeep
+
+# --- Docker & Sail ---
+# docker/
+# docker-compose.override.yml
+
+# --- Local Temporary Files ---
+output.txt
+routes.json
 Homestead.json
 Homestead.yaml
-npm-debug.log
-output.txt
-Thumbs.db
-yarn-error.log
 
-# # Ignore images
-# *.jpg
-# *.jpeg
-# *.png
-# *.gif
-# *.bmp
-# *.tif
-# *.tiff
-
-# # Ignore ZIP files
+# --- Miscellaneous ---
 *.zip
-
-# # Ignore PDF files
-# *.pdf
-yarn.lock
+/storage/app/public/
+/storage/framework/cache/data/
+/storage/framework/views/*.php
+/storage/framework/sessions/
+/storage/logs/*.log

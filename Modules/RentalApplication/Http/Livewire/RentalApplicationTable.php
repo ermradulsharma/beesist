@@ -22,6 +22,7 @@ class RentalApplicationTable extends DataTableComponent
     public $model = RentalApplication::class;
     public $account_id;
     protected $listeners = ['confirmSendAgreement', 'sendAgreement'];
+
     public function mount($account_id = null)
     {
         $this->account_id = $account_id;
@@ -106,6 +107,7 @@ class RentalApplicationTable extends DataTableComponent
                     $sendTenancyAgreementButton = '<a href="' . $sendAgreementUrl . '" data-toggle="tooltip" title="Send Tenancy Agreement" class="btn btn-success btn-sm p-1 mr-1" target="_blank"><i class="fas fa-paper-plane m-0" style="font-size: 11px;"></i></a>';
                 }
                 $buttons = $leasingButton . $viewButton . ($row->status == 0 ? $resumeButton : (($percent == 100 && $row->status != 2) ? $approveButton : ($row->status == 2 ? $sendTenancyAgreementButton : ''))) . $deleteButton;
+
                 return '<div class="d-flex align-items-center">' . $buttons . '</div>';
             })->html()->collapseOnTablet(),
             Auth::user()->hasRole('Property Manager') ? Column::make(__('Assign To'), 'property.agentDetail.name')->searchable() : Column::make(__('Managed By'))->label(function ($row) {
@@ -121,6 +123,7 @@ class RentalApplicationTable extends DataTableComponent
             Column::make(__('City'), 'city')->sortable()->searchable()->collapseOnTablet(),
             Column::make(__('Status'))->format(function ($value) {
                 $labels = ['Draft', 'New', 'Approved', 'Rejected', 'Canceled', 'Undecided', 'Deferred', 'Added to lease'];
+
                 return isset($labels[$value]) ? $labels[$value] : 'Unknown';
             })->searchable()->sortable(),
             Column::make(__('Progress'))->label(function ($row) {

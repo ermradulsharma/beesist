@@ -8,40 +8,40 @@ use App\Notifications\ThankYouEmailNotification;
 use App\Notifications\WelcomeEmailNotification;
 use Auth;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Str;
 use Modules\Leads\Notifications\FormNotification;
 use Modules\Property\Entities\Property;
 use Modules\Tenant\Entities\Tenant;
-use Modules\Tenant\Notifications\NewUser;
 
 class TenantController extends Controller
 {
     protected $userService;
+
     public function __construct(UserService $userService)
     {
         $this->userService = $userService;
     }
+
     protected function createUser(array $data)
     {
         return $this->userService->registerUser($data);
     }
-    
+
     public function index()
     {
         $properties = Property::latest()->get();
+
         return view('tenant::index', compact('properties'));
     }
 
     public function store(Request $request)
     {
         $userExists = User::where('email', $request->email)->first();
-        if (!$userExists) {
+        if (! $userExists) {
             $password = str_random(8);
             $userData = [
                 'first_name' => $request->fname,
@@ -51,7 +51,7 @@ class TenantController extends Controller
                 'phone' => $request->phone,
                 'country' => $request->country ?? 'CA',
                 'type' => 'user',
-                'password' => bcrypt($password)
+                'password' => bcrypt($password),
             ];
             event(new Registered($createUser = $this->createUser($userData)));
             $createUser->assignRole('Tenant');
@@ -92,9 +92,10 @@ class TenantController extends Controller
         <p>Please contact us if you have any questions or need assistance simply by replying to this email.</p>';
         $userObj = collectData($user, $subject, $message);
         $user->notify(new ThankYouEmailNotification($userObj));
-        if (isset($request->by_admin) &&  $request->by_admin == 'YES') {
+        if (isset($request->by_admin) && $request->by_admin == 'YES') {
             return back();
         }
+
         return redirect()->route('rental_application.rentalApplication');
     }
 
@@ -133,7 +134,7 @@ class TenantController extends Controller
                     $message->subject('Registration confirmed at ' . $user['site_name'] . '!');
                     $message->to($user['user_mail']);
                 });
-                if (isset($request->by_admin) &&  $request->by_admin == 'YES') {
+                if (isset($request->by_admin) && $request->by_admin == 'YES') {
                 } else {
                     Mail::send('emails.newUserAdmin', ['name' => $request->fname, 'email' => $user_created->email, 'phone' => $user_created->phone, 'country' => ''], function ($message) use ($user) {
                         $message->from($user['from_email'], $user['from_name']);
@@ -166,9 +167,10 @@ class TenantController extends Controller
         });
 
 
-        if (isset($request->by_admin) &&  $request->by_admin == 'YES') {
+        if (isset($request->by_admin) && $request->by_admin == 'YES') {
             return back();
         }
+
         return Redirect::to('https://bolld.managebuilding.com/Resident/apps/rentalapp');
     }
 }

@@ -25,4 +25,3 @@ class TenancyEndNoticeFactory extends Factory
         ];
     }
 }
-

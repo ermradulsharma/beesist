@@ -4,7 +4,6 @@ namespace App\Domains\Auth\Http\Middleware;
 
 use App\Domains\Auth\Models\User;
 use Closure;
-use Illuminate\Support\Facades\Auth;
 
 /**
  * Class UserCheck.
@@ -28,6 +27,7 @@ class UserCheck
                 return $next($request);
             }
         }
+
         return redirect()->route('frontend.index')->withFlashDanger(__('You do not have access to do that.'));
     }
 }

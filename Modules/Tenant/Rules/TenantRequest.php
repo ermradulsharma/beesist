@@ -27,14 +27,16 @@ class TenantRequest implements Rule
     {
         if (is_array($value)) {
             foreach ($value as $element) {
-                if (!is_string($element) || strlen($element) === 0) {
+                if (! is_string($element) || strlen($element) === 0) {
                     return false;
                 }
             }
+
             return true;
         } elseif (is_string($value) && strlen($value) === 0) {
             return false;
-        } 
+        }
+
         return true;
     }
 

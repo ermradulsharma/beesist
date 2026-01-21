@@ -3,7 +3,6 @@
 namespace App\Domains\Auth\Models\Traits\Relationship;
 
 use App\Domains\Auth\Models\PasswordHistory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * Class UserRelationship.

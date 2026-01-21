@@ -3,9 +3,8 @@
 namespace Modules\Leads\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\HtmlString;
 
 class ApplicationAttachementNotification extends Notification
@@ -65,6 +64,7 @@ class ApplicationAttachementNotification extends Notification
                 $message->attach($this->attachment);
             }
         }
+
         return $message;
     }
 

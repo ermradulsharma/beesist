@@ -3,15 +3,16 @@
 namespace Modules\RentalApplication\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\HtmlString;
 
 class RentalApplicationNotification extends Notification
 {
     use Queueable;
-    public $userObj, $subject, $message;
+    public $userObj;
+    public $subject;
+    public $message;
 
     /**
      * Create a new notification instance.
@@ -44,7 +45,7 @@ class RentalApplicationNotification extends Notification
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject($this->subject)
             ->greeting('Hello ' . $this->userObj['first_name'] . ',')
             ->line(new HtmlString($this->message))

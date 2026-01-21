@@ -29,6 +29,7 @@ class PackageController extends Controller
     public function create($package = null)
     {
         $services = Service::get();
+
         return view('backend.subscription.package.create', compact('package', 'services'));
     }
 
@@ -68,7 +69,7 @@ class PackageController extends Controller
 
         $requestData = $request->all();
         $requestData['slug'] = Str::slug($requestData['title']);
-        $serviceIds =  $requestData['services'];
+        $serviceIds = $requestData['services'];
         unset($requestData['services']);
         $package = Package::create($requestData);
         $package->packageServices()->sync($serviceIds);
@@ -84,8 +85,8 @@ class PackageController extends Controller
             'description' => $package->description,
             'metadata' => [
                 'property_limit' => (string)$package->total_property_limit,
-                'features' => json_encode($features)
-            ]
+                'features' => json_encode($features),
+            ],
         ]);
 
         $price = $stripe->prices->create([
@@ -98,8 +99,9 @@ class PackageController extends Controller
         ]);
         $package->update([
             'stripe_product_id' => $product->id,
-            'stripe_price_id' => $price->id
+            'stripe_price_id' => $price->id,
         ]);
+
         return redirect()->route('admin.subscription.packages.index')->withFlashSuccess(__('Package Created Successfully'));
     }
 
@@ -124,6 +126,7 @@ class PackageController extends Controller
     {
         $selectedServices = $package->services;
         $services = Service::get();
+
         return view('backend.subscription.package.create', compact('package', 'services', 'selectedServices'));
     }
 
@@ -138,7 +141,7 @@ class PackageController extends Controller
     {
         $requestData = $request->all();
         $requestData['slug'] = Str::slug($requestData['title']);
-        $serviceIds =  $requestData['services'];
+        $serviceIds = $requestData['services'];
         unset($requestData['services']);
         $package->update($requestData);
         $package->packageServices()->sync($serviceIds);
@@ -155,8 +158,8 @@ class PackageController extends Controller
                     'description' => $package->description,
                     'metadata' => [
                         'property_limit' => (string)$package->total_property_limit,
-                        'features' => json_encode($features)
-                    ]
+                        'features' => json_encode($features),
+                    ],
                 ]);
                 $newPrice = $stripe->prices->create([
                     'product' => $package->stripe_product_id,
@@ -199,12 +202,13 @@ class PackageController extends Controller
                 ]);
                 $package->update([
                     'stripe_product_id' => $product->id,
-                    'stripe_price_id' => $price->id
+                    'stripe_price_id' => $price->id,
                 ]);
             } catch (\Exception $e) {
                 Log::error($e->getMessage());
             }
         }
+
         return redirect()->route('admin.subscription.packages.index')->withFlashSuccess(__('Package Created Successfully'));
     }
 

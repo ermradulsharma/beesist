@@ -9,7 +9,6 @@ use App\Domains\Auth\Models\User;
  */
 trait UserScope
 {
-
     /**
      * @return mixed
      */

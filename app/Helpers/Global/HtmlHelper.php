@@ -1,6 +1,6 @@
 <?php
 
-if (!function_exists('activeClass')) {
+if (! function_exists('activeClass')) {
     /**
      * Get the active class if the condition is not falsy.
      *
@@ -14,7 +14,7 @@ if (!function_exists('activeClass')) {
     }
 }
 
-if (!function_exists('htmlLang')) {
+if (! function_exists('htmlLang')) {
     /**
      * Access the htmlLang helper.
      */
@@ -24,7 +24,7 @@ if (!function_exists('htmlLang')) {
     }
 }
 
-if (!function_exists('Countries')) {
+if (! function_exists('Countries')) {
     function Countries()
     {
         $country = [

@@ -5,7 +5,6 @@ namespace Modules\Leads\Http\Livewire;
 use App\Models\RentalEvaluation as ModelsRentalEvaluation;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
-use Livewire\Component;
 use Modules\Leads\Entities\UserEntity;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
@@ -19,6 +18,7 @@ class RentalEvaluation extends DataTableComponent
     protected $model = ModelsRentalEvaluation::class;
     public $confirming = null;
     public $account_id;
+
     public function mount($account_id = null)
     {
         $this->account_id = $account_id;
@@ -29,6 +29,7 @@ class RentalEvaluation extends DataTableComponent
         $this->model::find($id)->delete();
         $this->dispatch('swal:modal', type: 'success', message: 'Rental Evalution Request Deleted Successfully!');
     }
+
     public function configure(): void
     {
         $this->setPrimaryKey('id')->setDefaultSort('id', 'DESC');
@@ -41,10 +42,11 @@ class RentalEvaluation extends DataTableComponent
                 $url = route(rolebased() . '.rental_evaluation.evaluationForm', ['id' => $row->id]);
                 $sendReport = '<a href="' . $url . '" data-toggle="tooltip" title="Send Report" class="btn btn-success p-1 mr-1 d-flex align-items-center" target="__blank"><i class="fas fa-paper-plane m-0" style="font-size: 11px;"></i></a>';
                 $deleteButton = '<a href="javascript:void(0)" data-toggle="tooltip" title="Remove Request" wire:confirm="Are You Sure? Want to remove" wire:click="delete(' . $row->id . ')" class="btn btn-danger p-1 mr-1 d-flex align-items-center"><i class="fas fa-trash m-0" style="font-size: 11px;"></i></a>';
+
                 return '<div class="d-flex align-items-center">' . $sendReport . $deleteButton . '</div>';
             })->html(),
             Column::make('ID', 'id')->collapseAlways(),
-            Auth::user()->hasRole('Property Manager') ?  '' : Column::make('Manager', 'userDetails.name')->sortable()->searchable(),
+            Auth::user()->hasRole('Property Manager') ? '' : Column::make('Manager', 'userDetails.name')->sortable()->searchable(),
             // Column::make('Manager', 'userDetails.name')->sortable()->searchable(),
             Column::make('Address', 'address')->sortable()->searchable(),
             Column::make('Unit No', 'unit_no')->sortable()->searchable(),
@@ -113,6 +115,7 @@ class RentalEvaluation extends DataTableComponent
             }
             if ($this->account_id && $user->hasAgentAccess()) {
                 $accountId = UserEntity::where(['entity_key' => 'Agent', 'entity_value' => $this->account_id])->pluck('account_id');
+
                 return $this->model::whereIn('account_id', $accountId);
             }
         }

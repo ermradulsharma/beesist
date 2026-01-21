@@ -2,15 +2,13 @@
 
 namespace App\Console\Commands;
 
+use Modules\Cms\Entities\EmailTemplate;
+use App\Mail\GetQuoteNotification;
+use App\Notification;
+use App\QuoteRequests;
+use App\Domains\Auth\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\GetQuoteNotification;
-use App\QuoteRequests;
-use App\User;
-use App\EmailTemplate;
-use App\Notification;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Crypt;
 
 class ServiceInfoPackage extends Command
 {
@@ -46,7 +44,7 @@ class ServiceInfoPackage extends Command
     public function handle()
     {
         $quotes = QuoteRequests::where('notify_status', '0')->where('area', 'Vancouver Lower Mainland')->get();
-        $email_data = \App\EmailTemplate::where('title', 'SERVICE INFO PACKAGE')->first();
+        $email_data = EmailTemplate::where('title', 'SERVICE INFO PACKAGE')->first();
         if ($email_data->status == '1') {
             $additional = User::whereIn('id', explode(',', $email_data->other_reciepients))->get();
 

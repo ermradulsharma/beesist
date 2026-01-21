@@ -8,17 +8,18 @@ use Modules\Leads\Entities\UserEntity;
 use Modules\Property\Entities\Property;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
-use Rappasoft\LaravelLivewireTables\Views\Columns\ImageColumn;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 
 class ScheduleShowingTable extends DataTableComponent
 {
     protected $model = Property::class;
     public $account_id;
+
     public function mount($account_id = null)
     {
         $this->account_id = $account_id;
     }
+
     public function configure(): void
     {
         $this->setPrimaryKey('id')->setDefaultSort('id', 'desc');
@@ -33,6 +34,7 @@ class ScheduleShowingTable extends DataTableComponent
                 $url = $row->featured_image['url'] ?? null;
                 $imageSrc = $url ? asset('uploads/properties/' . $row->id . '/property_photos/thumbs/' . $url) : asset('images/bolld-placeholder.png');
                 $propertyUrl = route('property.single', $row->slug);
+
                 return '<a href="' . $propertyUrl . '" target="_blank"><img src="' . $imageSrc . '" alt="' . $row->name . '" class="card-img" style="width: 44px; min-width: 50px;"></a>';
             })->html(),
             Column::make(__('Property Name'), 'title')->searchable()->sortable(),
@@ -53,6 +55,7 @@ class ScheduleShowingTable extends DataTableComponent
                 $viewtUrl = route('property.single', ['property' => $row->slug]);
                 $viewButton = '<a target="_blank" href="' . $viewtUrl . '" data-toggle="tooltip" title="View Property" class="btn btn-info btn-sm mr-2"><i class="fas fa-eye"></i></a>';
                 $buttons = $viewButton . $scheduleButton;
+
                 return '<div class="d-flex">' . $buttons . '</div>';
             })->html(),
         ];
@@ -88,12 +91,13 @@ class ScheduleShowingTable extends DataTableComponent
             if ($this->account_id && $user->hasManagerAccess()) {
                 $query->where('account_id', $this->account_id);
                 $entityIds = $query->pluck('entity_value');
+
                 return Property::whereIn('id', $entityIds)->whereRaw("FIND_IN_SET('For Rent', prop_status) > 0");
             }
 
             if ($this->account_id && $user->hasRole('Property Owner')) {
                 return Property::where('user_id', $this->account_id)->whereRaw("FIND_IN_SET('For Rent', prop_status) > 0");
-            } else if ($user->hasRole('Agent')) {
+            } elseif ($user->hasRole('Agent')) {
                 return Property::whereIn('prop_agents', [$user->id])->whereRaw("FIND_IN_SET('For Rent', prop_status) > 0");
             }
         }

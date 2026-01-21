@@ -11,7 +11,10 @@ use Modules\Property\Entities\ShowingApplication;
 class UserShowing extends Notification
 {
     use Queueable;
-    public $showing, $message, $subject;
+    public $showing;
+    public $message;
+    public $subject;
+
     /**
      * Create a new notification instance.
      *
@@ -43,7 +46,7 @@ class UserShowing extends Notification
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject($this->subject)
             ->greeting('Hello '.$this->showing->tenant->first_name)
             ->line(new HtmlString($this->message));

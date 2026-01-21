@@ -12,8 +12,9 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Announcement extends Model
 {
-    use AnnouncementScope, HasFactory;
-    
+    use AnnouncementScope;
+    use HasFactory;
+
     public const TYPE_FRONTEND = 'frontend';
     public const TYPE_BACKEND = 'backend';
     protected static $logFillable = true;

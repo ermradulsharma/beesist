@@ -44,6 +44,7 @@ class ServiceController extends Controller
                 'status' => $status,
             ]);
         }
+
         return redirect()->route('admin.subscription.services.index')->withFlashSuccess(__('Service Created Successfully'));
     }
 
@@ -87,6 +88,7 @@ class ServiceController extends Controller
                 'status' => $status,
             ]);
         }
+
         return redirect()->route('admin.subscription.services.index')->withFlashSuccess(__('Service Updated Successfully'));
     }
 

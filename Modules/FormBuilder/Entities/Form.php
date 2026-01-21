@@ -10,9 +10,9 @@ class Form extends Model
 {
     use HasFactory;
 
-    const FORM_PUBLIC = 'PUBLIC';
+    public const FORM_PUBLIC = 'PUBLIC';
 
-    const FORM_PRIVATE = 'PRIVATE';
+    public const FORM_PRIVATE = 'PRIVATE';
 
     protected $fillable = [];
 

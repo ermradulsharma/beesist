@@ -5,8 +5,8 @@ namespace Modules\Tenant\Entities;
 use App\Domains\Auth\Models\User;
 use Cache;
 use DB;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Leads\Entities\UserEntity;
 use Modules\Property\Entities\Property;
 
@@ -55,7 +55,7 @@ class TenantAgreement extends Model
         'agreement_notes',
         'approved_on',
         'notify_status',
-        'disclaimer'
+        'disclaimer',
     ];
 
     protected static function newFactory()

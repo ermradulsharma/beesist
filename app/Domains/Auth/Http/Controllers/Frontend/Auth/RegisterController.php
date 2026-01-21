@@ -86,7 +86,7 @@ class RegisterController
         $nameValidation = ['required', 'string', 'max:100',];
         $emailValidation = ['required', 'string', 'email', 'max:255', Rule::unique('users'),];
         $passwordValidation = array_merge(['max:16', 'regex:/[a-z]/', 'regex:/[A-Z]/', 'regex:/[0-9]/', 'regex:/[@$!%*?&]/',], Password::min(8)->mixedCase()->numbers()->symbols());
-        $captchaValidation = ['required_if:captcha_status,true', new Captcha,];
+        $captchaValidation = ['required_if:captcha_status,true', new Captcha(),];
         if (isset($data['name'])) {
             $nameValidationRules = ['name' => $nameValidation];
         } else {
@@ -119,7 +119,7 @@ class RegisterController
             'email' => ['required', 'email', 'unique:users,email', 'email:rfc,dns'],
             'password' => ['required', 'string', 'max:16', 'confirmed', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/'],
             'terms' => ['required', 'in:1'],
-            'captcha' => ['required_if:captcha_status,true', new Captcha],
+            'captcha' => ['required_if:captcha_status,true', new Captcha()],
         ];
 
         $messages = [
@@ -140,6 +140,7 @@ class RegisterController
         if ($validator->fails()) {
             return response(['error' => $validator->errors(), 'status' => 422, 'success' => false], 422);
         }
+
         try {
             DB::beginTransaction();
             event(new Registered($user = $this->create($request->all())));
@@ -157,9 +158,11 @@ class RegisterController
             $setupIntent = $user->createSetupIntent();
             $newCsrfToken = csrf_token();
             DB::commit();
+
             return response(['data' => $user, 'token' => $newCsrfToken, 'intent' => $setupIntent, 'message' => 'User Register successful', 'status' => 200, 'success' => true], 200);
         } catch (\Exception $th) {
             DB::rollBack();
+
             throw new GeneralException(__('There was a problem creating this user. Please try again.'));
         }
     }
@@ -185,6 +188,7 @@ class RegisterController
             'subject' => appName() . ' - Verification Code',
             'message' => 'Your verification code is ' . $otp,
         ];
+
         try {
             $user->notify(new SendVerificationCodeNotification($data));
             Session::put('code', $otp);
@@ -207,7 +211,7 @@ class RegisterController
             'email' => ['required', 'email', 'unique:users,email', 'regex:/^[\w\.\+-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,6}$/', 'email:rfc,dns'],
             'password' => ['required', 'string', 'max:16', 'confirmed', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/'],
             'terms' => ['required', 'in:1'],
-            'captcha' => ['required_if:captcha_status,true', new Captcha],
+            'captcha' => ['required_if:captcha_status,true', new Captcha()],
         ];
 
         $messages = [
@@ -251,9 +255,11 @@ class RegisterController
             $this->guard()->login($user);
             $setupIntent = $user->createSetupIntent();
             DB::commit();
+
             return response(['intent' => $setupIntent, 'message' => 'Registration successful', 'status' => 200, 'success' => true], 200);
         } catch (\Exception $th) {
             DB::rollBack();
+
             throw new GeneralException(__('There was a problem creating this user. Please try again.'));
         }
     }
