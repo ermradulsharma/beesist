@@ -1,0 +1,11 @@
+{
+    "name": "RentalApplication",
+    "alias": "rentalapplication",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\RentalApplication\\Providers\\RentalApplicationServiceProvider"
+    ],
+    "files": []
+}

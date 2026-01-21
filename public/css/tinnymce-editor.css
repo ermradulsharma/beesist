@@ -1,0 +1,33 @@
+.mce-content-body {
+    padding: 15px !important
+}
+
+/* .mce-content-body section {
+    border: 1px dashed;
+    padding: 15px !important;
+    margin-top: 20px;
+    margin-bottom: 20px;
+} */
+
+.mce-visualblocks address,
+.mce-visualblocks article,
+.mce-visualblocks aside,
+.mce-visualblocks blockquote,
+.mce-visualblocks div:not([data-mce-bogus]),
+.mce-visualblocks dl,
+.mce-visualblocks figcaption,
+.mce-visualblocks figure,
+.mce-visualblocks h1,
+.mce-visualblocks h2,
+.mce-visualblocks h3,
+.mce-visualblocks h4,
+.mce-visualblocks h5,
+.mce-visualblocks h6,
+.mce-visualblocks hgroup,
+.mce-visualblocks ol,
+.mce-visualblocks p,
+.mce-visualblocks pre,
+.mce-visualblocks section,
+.mce-visualblocks ul {
+    margin-left: auto !important;
+}

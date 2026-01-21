@@ -1,0 +1,23 @@
+{{-- <x-livewire-tables::table.cell>
+    <div style="min-width:100px">
+        <a href="{{ route('admin.buildings.edit', $row->id) }}" data-toggle="tooltip" title="Edit Page" class="btn btn-info btn-sm"><i class="fas fa-pen"></i></a>
+        <a target="_blank" href="{{ route('building.single', $row->slug) }}" data-toggle="tooltip" title="View Page" class="btn btn-success btn-sm"><i class="fas fa-eye"></i></a>
+        @if ($confirming === $row->id)
+            <button type="button" data-toggle="tooltip" title="Are You Sure? Want to delete" wire:click="delete({{ $row->id }})" class="btn btn-danger btn-sm delete_item">Are You Sure?</button>
+        @else
+            <button type="button" data-toggle="tooltip" title="Delete PMA" wire:click="confirmDelete({{ $row->id }})" class="btn btn-danger btn-sm delete_item"><i class="fas fa-trash"></i></button>
+        @endif
+    </div>
+</x-livewire-tables::table.cell>
+
+<x-livewire-tables::table.cell>{{ $row->id }}</x-livewire-tables::table.cell>
+<x-livewire-tables::table.cell>{{ $row->title }}</x-livewire-tables::table.cell>
+<x-livewire-tables::table.cell>{{ json_decode($row->location)->address ?? '' }}</x-livewire-tables::table.cell>
+<x-livewire-tables::table.cell>{{ json_decode($row->location)->city ?? '' }}</x-livewire-tables::table.cell>
+<x-livewire-tables::table.cell>{{ $row->avg_sqft_rate }}</x-livewire-tables::table.cell>
+<x-livewire-tables::table.cell>{{ $row->avg_strata_fee }}</x-livewire-tables::table.cell>
+<x-livewire-tables::table.cell>{{ json_decode($row->construction_info)->levels }}</x-livewire-tables::table.cell>
+<x-livewire-tables::table.cell>{{ $row->status }}</x-livewire-tables::table.cell>
+<x-livewire-tables::table.cell>{{ $row->created_at }}</x-livewire-tables::table.cell>
+<x-livewire-tables::table.cell>{{ $row->updated_at }}</x-livewire-tables::table.cell>
+ --}}

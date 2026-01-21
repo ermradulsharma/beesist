@@ -1,0 +1,17 @@
+@extends('backend.layouts.app')
+@section('title', __('Role Management'))
+@section('content')
+    <x-backend.card>
+        <x-slot name="header">
+            @lang('Role Management')
+        </x-slot>
+        <x-slot name="headerActions">
+            <x-utils.link icon="c-icon cil-plus" class="card-header-action" :href="route(rolebased() . '.auth.role.create')" :text="__('Create Role')" />
+        </x-slot>
+        <x-slot name="body">
+            <div x-data="{ currentlyReorderingStatus: false }">
+                <livewire:backend.roles-table />
+            </div>
+        </x-slot>
+    </x-backend.card>
+@endsection

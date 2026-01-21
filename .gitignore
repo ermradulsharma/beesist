@@ -1,0 +1,46 @@
+/coverage
+/node_modules
+/public/storage
+/public/mix-manifest.json
+/public/uploads
+/storage/*.key
+/vendor
+docker
+/.vscode
+*.sublime-project
+*.sublime-workspace
+_ide_helper.php
+.DS_Store
+.env
+.env.backup
+.idea
+.php_cs.cache
+.phpunit.result.cache
+.phpstorm.meta.php
+.project
+composer.phar
+coverage.xml
+docker-compose.override.yml
+error.log
+Homestead.json
+Homestead.yaml
+npm-debug.log
+output.txt
+Thumbs.db
+yarn-error.log
+
+# # Ignore images
+# *.jpg
+# *.jpeg
+# *.png
+# *.gif
+# *.bmp
+# *.tif
+# *.tiff
+
+# # Ignore ZIP files
+*.zip
+
+# # Ignore PDF files
+# *.pdf
+yarn.lock

@@ -1,0 +1,1079 @@
+@extends('backend.layouts.app')
+
+@section('title', __('Add Property'))
+@push('after-styles')
+    <style>
+        .card-header *,
+        .form-group label {
+            font-weight: 600
+        }
+
+        .files_inner ul {
+            padding: 0;
+        }
+    </style>
+    <x-head.tinymce-config />
+@endpush
+@section('content')
+
+    @php
+        if ($property) {
+            $strata_property_details = json_decode($property->strata_property_details);
+            $occupancy_tenant_info = json_decode($property->occupancy_tenant_info, true);
+            $utilities = json_decode($property->utilities, true);
+            if (!empty($property->prop_agents)) {
+                $prop_agents = json_decode($property->prop_agents);
+            } else {
+                $prop_agents = [];
+            }
+        } else {
+            $prop_agents = [];
+        }
+        if (isset($property['address'])) {
+            $geo = get_lat_long($property['address']);
+        
+            if (isset($geo['lat'], $geo['long'])) {
+                $lat_long = $geo['lat'] . ', ' . $geo['long'];
+                $zoom = 15;
+            } else {
+                $lat_long = '49.282730, -123.120735';
+                $zoom = 12;
+            }
+        } else {
+            $lat_long = '49.282730, -123.120735';
+            $zoom = 12;
+        }
+    @endphp
+
+    @if ($property->id)
+        <form method="post" action="{{ route('admin.properties.update', $property) }}" id="submit_property_form" enctype="multipart/form-data">
+            <input type="hidden" name="_method" value="patch">
+        @else
+            <form method="post" action="{{ route('admin.properties.store', @$property->id) }}" id="submit_property_form" enctype="multipart/form-data">
+    @endif
+    @csrf
+
+    <div class="row">
+        <div class="col-12 col-sm-8 col-md-9">
+            <div class="card box-primary">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="title">Property Title</label>
+                        <input class="form-control" name="title" id="title" placeholder="Enter Property Title" value="{{ old('title', @$property->title) }}" type="text">
+                    </div>
+                    @if ($property->id)
+                        <div class="form-group">
+                            <label for="slug">Property Slug</label>
+                            <input class="form-control" name="slug" placeholder="Property Slug" id="slug" value="{{ old('slug', @$property->slug) }}" type="text">
+                        </div>
+                    @endif
+                    <div class="form-group">
+                        <label for="content">Property Description</label>
+                        <textarea id="myeditorinstance" name="content" placeholder="Property Description">{!! old('content', @$property->content) !!}</textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="prop_type">Property Type</label>
+                                <select name="prop_type" id="prop_type" class="form-control">
+                                    <option value="Strata unit/property" selected="">Strata unit/property</option>
+                                    <option value="Single family/privately owned non strata property">Single family/privately owned non strata property</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="strata_fees_paying">How much do you currently pay for your strata fees per month?</label>
+                                <input class="form-control" name="strata_fees_paying" id="strata_fees_paying" placeholder="Current Strata Fees Paying" type="text">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card box-info my-4" id="StrataProperty">
+                        <div class="card-header">
+                            <h5>Strata unit/property details</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group {{ $errors->has('strata_property_details.suite') ? 'has-error' : '' }}">
+                                        <label for="spd_suite">Suite#</label>
+                                        <input id="spd_suite.suite" name="strata_property_details[suite]" value="{{ @old('strata_property_details.suite', $strata_property_details->suite) }}" type="text" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group {{ $errors->has('strata_property_details.address') ? 'has-error' : '' }}">
+                                        <label for="spd_address">Address</label>
+                                        <input id="spd_address" name="strata_property_details[address]" value="{{ @old('strata_property_details.address', $strata_property_details->address) }}" type="text" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group {{ $errors->has('strata_property_details.city') ? 'has-error' : '' }}">
+                                        <label for="spd_city">City</label>
+                                        <input id="spd_city" name="strata_property_details[city]" value="{{ @old('strata_property_details.city', $strata_property_details->city) }}" type="text" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group {{ $errors->has('strata_property_details.state') ? 'has-error' : '' }}">
+                                        <label for="spd_state">State / Province / Region</label>
+                                        <input id="spd_state" name="strata_property_details[state]" value="{{ @old('strata_property_details.state', $strata_property_details->state) }}" type="text" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group {{ $errors->has('strata_property_details.zip') ? 'has-error' : '' }}">
+                                        <label for="spd_zip">ZIP / Postal Code</label>
+                                        <input id="spd_zip" name="strata_property_details[zip]" value="{{ @old('strata_property_details.zip', $strata_property_details->zip) }}" type="text" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group form-control-wrap {{ $errors->has('strata_property_details.country') ? 'has-error' : '' }}">
+                                        <label for="spd_country">Country</label>
+                                        <select id="spd_country" class="form-control" name="strata_property_details[country]">
+                                            <option value="">Select Country*</option>
+                                            @php
+                                                $sel_country = @old('strata_property_details.country', $strata_property_details->country ?? 'CA');
+                                            @endphp
+                                            @foreach (Countries() as $country)
+                                                <option value="{{ $country->iso }}" {{ $sel_country == $country->iso ? 'selected' : '' }}>{{ $country->nicename }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group {{ $errors->has('strata_property_details.strata_management_company') ? 'has-error' : '' }}">
+                                        <label for="spd_strata_management_company">Strata management company</label>
+                                        <input id="spd_strata_management_company" name="strata_property_details[strata_management_company]" value="{{ @old('strata_property_details.strata_management_company', $strata_property_details->strata_management_company) ?? '' }}" type="text" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group {{ $errors->has('strata_property_details.strata_manager_name') ? 'has-error' : '' }}">
+                                        <label for="spd_strata_manager_name">Strata manager's name</label>
+                                        <input id="spd_strata_manager_name" name="strata_property_details[strata_manager_name]" value="{{ @old('strata_property_details.strata_manager_name', $strata_property_details->strata_manager_name) ?? '' }}" type="text" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group {{ $errors->has('strata_property_details.strata_manager_phone_number') ? 'has-error' : '' }}">
+                                        <label for="spd_strata_manager_phone_number">Strata manager's phone number</label>
+                                        <input id="spd_strata_manager_phone_number" name="strata_property_details[strata_manager_phone_number]" value="{{ @old('strata_property_details.strata_manager_phone_number', $strata_property_details->strata_manager_phone_number) ?? '' }}" type="text" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group {{ $errors->has('strata_property_details.plan_num') ? 'has-error' : '' }}">
+                                        <label for="spd_plan_num">Strata Plan No</label>
+                                        <input id="spd_plan_num" name="strata_property_details[plan_num]" value="{{ @old('strata_property_details.plan_num', $strata_property_details->plan_num) ?? '' }}" type="text" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group {{ $errors->has('strata_property_details.lot_num') ? 'has-error' : '' }}">
+                                        <label for="spd_lot_num">Strata Lot Number</label>
+                                        <input id="spd_lot_num" name="strata_property_details[lot_num]" value="{{ @old('strata_property_details.lot_num', $strata_property_details->lot_num) ?? '' }}" type="text" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group {{ $errors->has('strata_property_details.civic') ? 'has-error' : '' }}">
+                                        <label for="spd_civic">Civic Address of the Property</label>
+                                        <input id="spd_civic" name="strata_property_details[civic]" value="{{ @old('strata_property_details.civic', $strata_property_details->civic) ?? '' }}" type="text" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group {{ $errors->has('strata_property_details.building_manager_name') ? 'has-error' : '' }}">
+                                        <label for="spd_building_manager_name">Building manager's name</label>
+                                        <input id="spd_building_manager_name" name="strata_property_details[building_manager_name]" value="{{ @old('strata_property_details.building_manager_name', $strata_property_details->building_manager_name) ?? '' }}" type="text" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group {{ $errors->has('strata_property_details.bm_phone_number') ? 'has-error' : '' }}">
+                                        <label for="spd_bm_phone_number">Building manager's phone number</label>
+                                        <input id="spd_bm_phone_number" name="strata_property_details[bm_phone_number]" value="{{ @old('strata_property_details.bm_phone_number', $strata_property_details->bm_phone_number) ?? '' }}" type="text" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group {{ $errors->has('strata_property_details.concierge_phone') ? 'has-error' : '' }}">
+                                        <label for="spd_concierge_phone">Concierge's phone number</label>
+                                        <input id="spd_concierge_phone" name="strata_property_details[concierge_phone]" value="{{ @old('strata_property_details.concierge_phone', $strata_property_details->concierge_phone) ?? '' }}" type="text" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group {{ $errors->has('strata_property_details.parking') ? 'has-error' : '' }}">
+                                        <label for="spd_parking">Parking stall number/numbers</label>
+                                        <input id="spd_parking" name="strata_property_details[parking]" value="{{ @old('strata_property_details.parking', $strata_property_details->parking) ?? '' }}" type="text" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group {{ $errors->has('strata_property_details.location_parking') ? 'has-error' : '' }}">
+                                        <label for="spd_location_parking">Location of parking</label>
+                                        <input id="spd_location_parking" name="strata_property_details[location_parking]" value="{{ @old('strata_property_details.location_parking', $strata_property_details->location_parking) ?? '' }}" type="text" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group {{ $errors->has('strata_property_details.storage_locker') ? 'has-error' : '' }}">
+                                        <label for="spd_storage_locker">Storage locker number/numbers</label>
+                                        <input id="spd_storage_locker" name="strata_property_details[storage_locker]" value="{{ @old('strata_property_details.storage_locker', $strata_property_details->storage_locker) ?? '' }}" type="text" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group {{ $errors->has('strata_property_details.location_storage') ? 'has-error' : '' }}">
+                                        <label for="spd_location_storage">Location of the storage</label>
+                                        <input id="spd_location_storage" name="strata_property_details[location_storage]" value="{{ @old('strata_property_details.location_storage', $strata_property_details->location_storage) ?? '' }}" type="text" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group {{ $errors->has('strata_property_details.amenities') ? 'has-error' : '' }}">
+                                        <label for="spd_amenities">Location of the amenities</label>
+                                        <input id="spd_amenities" name="strata_property_details[amenities]" value="{{ @old('strata_property_details.amenities', $strata_property_details->amenities) ?? '' }}" type="text" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group {{ $errors->has('insurance') ? 'has-error' : '' }}">
+                                <label for="insurance">RECITALS:</label>
+                                <select id="insurance" class="form-control" name="insurance">
+                                    <option value="">Have you purchased your rental property insurance?</option>
+                                    <option value="Yes" @if (@old('insurance', $property->insurance) == 'Yes') selected="selected" @endif>Yes</option>
+                                    <option value="No" @if (@old('insurance', $property->insurance) == 'No') selected="selected" @endif>No</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="virtual-tour">
+                        <div class="form-group">
+                            <label for="virtual_tour">Virtual Tour</label>
+                            <textarea class="form-control" name="virtual_tour" id="virtual_tour" rows="2">{{ old('virtual_tour', @$property->virtual_tour) }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="disclaimer">
+                        <div class="form-group">
+                            <label for="disclaimer">DISCLAIMER</label>
+                            <textarea class="form-control" name="disclaimer" id="disclaimer" rows="2">{{ old('disclaimer', @$property->disclaimer) }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="card box-info my-4">
+                        <div class="card-header">
+                            <h5>Location</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="location">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="address">Full Property Address</label>
+                                            <input id="autocomplete" class="form-control" placeholder="Enter your address" onFocus="geolocate()" type="text" autocomplete="off" />
+                                        </div>
+                                        <div id="map_canvas" style="width: 100%; height: 400px;margin-bottom:20px"></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="address">Street address (excluding city, province, and postal code)</label>
+                                            <input class="form-control" name="address" id="address" value="{{ @$property['address'] != '' ? $property['address'] : old('address', @$geo['formatted_address']) }}" type="text">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="country">Country</label>
+                                            <input class="form-control" name="country" id="country" value="{{ @$property['country'] != '' ? $property['country'] : old('country', @$geo['country']) }}" type="text">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="state">State</label>
+                                            <input class="form-control" name="state" id="state" value="{{ @$property['state'] != '' ? $property['state'] : old('state', @$geo['state']) }}" type="text">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="city">City</label>
+                                            <input class="form-control" name="city" id="city" value="{{ @$property['city'] != '' ? $property['city'] : old('city', @$geo['city']) }}" type="text">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="neighborhood">Neighborhood</label>
+                                            <input class="form-control" name="neighborhood" id="neighborhood" value="{{ @$property['neighborhood'] != '' ? $property['neighborhood'] : old('neighborhood') }}" type="text">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="zip">Zip</label>
+                                            <input class="form-control" name="zip" id="zip" value="{{ @$property['zip'] != '' ? $property['zip'] : old('zip', @$geo['postal_code']) }}" type="text">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="seo_title">Latitude</label>
+                                            <input class="form-control" name="lat" id="lat" placeholder="Enter Property Latitude" value="{{ @$property['lat'] != '' ? $property['lat'] : old('lat', @$geo['lat']) }}" type="text">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="long">Longitude</label>
+                                            <input class="form-control" name="lng" id="long" placeholder="Enter Property Longitude" value="{{ @$property['lng'] != '' ? $property['lng'] : old('lng', @$geo['long']) }}" type="text">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card box-info my-4">
+                        <div class="card-header">
+                            <h5>Strata bylaws/property related documents</h5>
+                        </div>
+                        <div class="card-body">
+                            {{-- <div class="files_inner">
+                                <div class="form-group">
+                                    <input id="Stratafiles" class="form-control" type="file" multiple>
+                                    <label for="Stratafiles"><span class="icon"><i class="fa fa-upload"> </i></span><span class="filename"></span><span class="info_text">Click to upload the current bylaws. (pdf, jpg, png)</span></label>
+                                </div>
+                                <div id="selectedStrata">
+                                    @if (isset($property->strata_documents))
+                                        @foreach ($property->strata_documents as $strata_document)
+                                            @if (pathinfo($strata_document->url, PATHINFO_EXTENSION) == 'pdf')
+                                                <span class="pip">
+                                                    <a href="{{ url('storage/files') }}/{{ $property->user_id }}/{{ $strata_document->url }}" data-lity data-lity-desc="{{ $strata_document->url }}"><img class="imageThumb" src="{{ asset('images/pdf-icon.png') }}"></a>
+                                                    <span class="selFileLive" data-id="{{ $strata_document->id }}" title="Click to remove"><i class="fa fa-trash"></i></span>
+                                                </span>
+                                            @else
+                                                <span class="pip">
+                                                    <a href="{{ url('storage/files') }}/{{ $property->user_id }}/{{ $strata_document->url }}" data-lity data-lity-desc="{{ $strata_document->url }}"><img class="imageThumb" src="{{ url('storage/files') }}/{{ $property->user_id }}/thumbs/{{ $strata_document->url }}"></a>
+                                                    <span class="selFileLive" data-id="{{ $strata_document->id }}" title="Click to remove"><i class="fa fa-trash"></i></span>
+                                                </span>
+                                            @endif
+                                        @endforeach
+                                    @endif
+
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div> --}}
+
+                            <div class="file-drop-area-wrap my-3">
+                                <div class="file-drop-area">
+                                    <span class="choose-file-button">Choose Files</span>
+                                    <span class="file-message">or drag and drop files here to upload the current bylaws. (pdf, jpg, png, gif)</span>
+                                    <input type="file" class="file-input" name="stratafiles[]" accept=".jpg,.jpeg,.png,.gif,.pdf" multiple>
+                                </div>
+                                <div class="divImageMediaPreview">
+                                    @if (isset($property) && $property->strataDocs != '')
+                                        @foreach (@$property->strataDocs as $strata_document)
+                                            @if (pathinfo($strata_document->url, PATHINFO_EXTENSION) == 'pdf')
+                                                <span class="pip">
+                                                    <a href="{{ url('uploads/properties/') }}/{{ @$property->id }}/strata/{{ $strata_document->url }}" data-lity data-lity-desc="{{ $strata_document->url }}"><img class="imageThumb" src="{{ asset('images/pdf-icon.png') }}"></a>
+                                                    <span class="selFileLive" data-id="{{ $strata_document->id }}" title="Click to remove"><i class="fa fa-trash"></i></span>
+                                                </span>
+                                            @else
+                                                <span class="pip">
+                                                    <a href="{{ url('uploads/properties/') }}/{{ @$property->id }}/strata/{{ $strata_document->url }}" data-lity data-lity-desc="{{ $strata_document->url }}"><img class="imageThumb" src="{{ url('uploads/properties/') }}/{{ @$property->id }}/strata/thumbs/{{ $strata_document->url }}"></a>
+                                                    <span class="selFileLive" data-id="{{ $strata_document->id }}" title="Click to remove"><i class="fa fa-trash"></i></span>
+                                                </span>
+                                            @endif
+                                        @endforeach
+                                    @endif
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="card box-info my-4">
+                        <div class="card-header">
+                            <h5>Property photos</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="file-drop-area-wrap my-3">
+                                <div class="file-drop-area">
+                                    <span class="choose-file-button">Choose Files</span>
+                                    <span class="file-message">or drag and drop files here to upload any property photos you have available. We do take our own photos, but having photos sooner allows us to expedite the rental process. (jpg, png, gif)</span>
+                                    <input type="file" class="file-input" name="propertyphotos[]" accept=".jpg,.jpeg,.png,.gif" multiple>
+                                </div>
+                                <div class="divImageMediaPreview">
+                                    @if (isset($property) && $property->propertyImages != '')
+                                        @foreach (@$property->propertyImages as $strata_document)
+                                            <span class="pip">
+                                                <a href="{{ url('uploads/properties') }}/{{ @$property->id }}/photos/{{ $strata_document->url }}" data-lity data-lity-desc="{{ $strata_document->url }}"><img class="imageThumb" src="{{ url('uploads/properties') }}/{{ @$property->id }}/photos/thumbs/{{ $strata_document->url }}"></a>
+                                                <span class="selFileLive" data-id="{{ $strata_document->id }}" title="Click to remove"><i class="fa fa-trash"></i></span>
+                                            </span>
+                                        @endforeach
+                                    @endif
+                                </div>
+                            </div>
+
+                            {{-- <div class="files_inner">
+                                <div class="form-group">
+                                    <input id="PropertyPhotos" class="form-control" type="file" multiple>
+                                    <label for="PropertyPhotos"><span class="icon"><i class="fa fa-upload"> </i></span><span class="filename"></span><span class="info_text">Click to upload any property photos you have available. <br />
+                                            We do take our own photos, but having photos sooner allows us to expedite the rental process. (jpg, png, gif)</span></label>
+                                </div>
+                                <ul id="selectedPhotos" class="ui-sortable">
+                                    @if (isset($property->property_photos))
+                                        @foreach ($property->property_photos as $property_photo)
+                                            <li class="pip ui-state-default" data-post-id="{{ $property_photo->id }}">
+                                                <img class="imageThumb" src="{{ url('storage/photos') }}/{{ $property->user_id }}/thumbs/{{ $property_photo->url }}">
+                                                <span class="selFileLive" data-id="{{ $property_photo->id }}" title="Click to remove"><i class="fa fa-trash"></i></span>
+                                                <span class="make_featured" data-id="{{ $property_photo->id }}" data-prop_id="{{ $property->id }}" data-user_id="{{ $property->user_id }}" title="Make Featured Image">
+                                                    @if ($property_photo->featured == '1')
+                                                        <i class="fa fa-heart"></i>
+                                                    @else
+                                                        <i class="fa fa-heart-o"></i>
+                                                    @endif
+                                                </span>
+                                            </li>
+                                        @endforeach
+                                    @endif
+                                </ul>
+                                <div class="clearfix"></div>
+                                <div class="alert alert-danger" style="display:none"></div>
+                            </div> --}}
+                        </div>
+                    </div>
+
+                    <div class="card box-info my-4">
+                        <div class="card-header">
+                            <h5>SEO Data</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="meta_title">SEO Title</label>
+                                <input class="form-control" name="meta_title" id="meta_title" placeholder="Enter SEO Property Title" value="{{ old('meta_title', @$property->meta_title) }}" type="text">
+                            </div>
+                            <div class="form-group">
+                                <label for="meta_description">SEO Description</label>
+                                <textarea class="form-control" id="meta_description" rows="4" name="meta_description" placeholder="SEO Description">{{ old('meta_description', @$property->meta_description) }}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="meta_keywords">SEO Keywords</label>
+                                <input class="form-control" name="meta_keywords" id="meta_keywords" placeholder="Enter SEO Keywords" value="{{ old('meta_keywords', @$property->meta_keywords) }}" type="text">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card box-info my-4">
+                        <div class="card-header">
+                            <h5>Custom Tags</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="custom_head_script">Custom Head Tag Code</label>
+                                <textarea class="form-control" name="custom_head_script" id="custom_head_script" placeholder="Custom Head Tag Code">{{ old('custom_head_script', @$property->custom_head_script) }}</textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="custom_footer_script">Custom Footer Tag Code</label>
+                                <textarea class="form-control" name="custom_footer_script" id="custom_footer_script" placeholder="Enter SEO Keywords">{{ old('custom_footer_script', @$property->custom_footer_script) }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-4 col-md-3">
+            <div class="card box-primary">
+                <div class="card-body">
+
+                    <div class="form-group">
+                        <div class="form-check  md-form-inline-check">
+                            <input type='hidden' value='0' name='featured'>
+                            <input class="form-check-input filled-in" name="featured" value="1" id="featured" type="checkbox" @if (old('featured', @$property->featured == '1')) checked @endif>
+                            <label class="form-check-label" for="featured"> Make Featured Property </label>
+                        </div>
+                    </div>
+
+                    @if (isset($buildings))
+                        <div class="form-group">
+                            <label for="other_buildings_in_complex">Building</label>
+                            <select class="form-control select_status" class="form-control" name="building_id" id="building_id">
+                                <option>-- Select Building --</option>
+                                @foreach ($buildings as $building)
+                                    <option value="{{ $building->id }}" {{ old('building_id', @$property->building_id) == $building->id ? 'selected' : '' }}>{{ $building->title }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
+
+                    <div class="form-group">
+                        <label for="name">Property Status</label>
+                        <select class="form-control select2 select_status" class="form-control" name="prop_status[]" multiple="multiple">
+                            <option value="For Rent" {{ collect(@old('prop_status', explode(',', $property->prop_status)))->contains('For Rent') ? 'selected' : '' }}>For Rent</option>
+                            <option value="For Sale" {{ collect(@old('prop_status', explode(',', $property->prop_status)))->contains('For Sale') ? 'selected' : '' }}>For Sale</option>
+                            <option value="Furnished" {{ collect(@old('prop_status', explode(',', $property->prop_status)))->contains('Furnished') ? 'selected' : '' }}>Furnished</option>
+                            <option value="Luxurious" {{ collect(@old('prop_status', explode(',', $property->prop_status)))->contains('Luxurious') ? 'selected' : '' }}>Luxurious</option>
+                            <option value="Rented" {{ collect(@old('prop_status', explode(',', $property->prop_status)))->contains('Rented') ? 'selected' : '' }}>Rented</option>
+                            <option value="Just Rented" {{ collect(@old('prop_status', explode(',', $property->prop_status)))->contains('Just Rented') ? 'selected' : '' }}>Just Rented</option>
+                            <option value="Sold" {{ collect(@old('prop_status', explode(',', $property->prop_status)))->contains('Sold') ? 'selected' : '' }}>Sold</option>
+                            <option value="Vacation Rental" {{ collect(@old('prop_status', explode(',', $property->prop_status)))->contains('Vacation Rental') ? 'selected' : '' }}>Vacation Rental</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group {{ $errors->has('unit_number') ? 'has-error' : '' }}">
+                        <label for="field_id_20">Unit number</label>
+                        <input id="field_id_20" name="unit_number" value="{{ old('unit_number', $property->unit_number ?? '') }}" type="text" class="form-control">
+
+                    </div>
+                    <div class="form-group">
+                        <label for="beds">Bedroom</label>
+                        <input class="form-control" name="beds" id="beds" placeholder="Enter Bedroom" value="{{ @$property['beds'] != '' ? $property['beds'] : old('beds') }}" step="0.50" type="number">
+                    </div>
+                    <div class="form-group">
+                        <label for="baths">Bathroom</label>
+                        <input class="form-control" name="baths" id="baths" placeholder="Enter Bathroom" value="{{ @$property['baths'] != '' ? $property['baths'] : old('baths') }}" step="0.50" type="number">
+                    </div>
+                    <div class="form-group">
+                        <label for="sleeps">Sleeps</label>
+                        <input class="form-control" name="sleeps" id="sleeps" placeholder="Enter Sleeps" value="{{ @$property['sleeps'] != '' ? $property['sleeps'] : old('sleeps') }}" step="0.50" type="number">
+                    </div>
+                    <div class="form-group">
+                        <label for="area">Square footage</label>
+                        <input class="form-control" name="area" id="area" placeholder="Enter Area Eg:1000 sqft" value="{{ @$property['area'] != '' ? $property['area'] : old('area') }}" type="text">
+                    </div>
+                    <div class="form-group">
+                        <label for="rate">Rates</label>
+                        <div class="row" style="text-align:left">
+
+                            <div class="col-6 col-sm-6 col-md-6 col-xs-6">
+                                <input class="form-control max_200" name="rate" id="rate" placeholder="Enter Rates" value="{{ @$property['rate'] != '' ? $property['rate'] : old('rate') }}" type="text">
+                            </div>
+                            <div class="col-6 col-sm-6 col-md-6 col-xs-6">
+                                <select class="form-control max_200" class="form-control" name="rateper">
+                                    <option value="Night" {{ $property->rateper == 'Night' ? 'selected' : '' }}>Night</option>
+                                    <option value="Week" {{ $property->rateper == 'Week' ? 'selected' : '' }}>Week</option>
+                                    <option value="Month" {{ $property->rateper == 'Month' ? 'selected' : '' }}>Month</option>
+                                    <option value="Year" {{ $property->rateper == 'Year' ? 'selected' : '' }}>Year</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="prop_url">Apply Online URL</label>
+                        <input class="form-control" name="prop_url" id="prop_url" placeholder="Enter Property URL" value="{{ @$property['prop_url'] != '' ? $property['prop_url'] : old('prop_url') }}" type="text">
+                    </div>
+                    <div class="form-group required form-control-wrap {{ $errors->has('parking') ? 'has-error' : '' }}">
+                        <label for="field_id_24">Parking</label>
+                        <select id="field_id_24" class="form-control" name="parking">
+                            <option value="">Parking</option>
+                            <option value="Yes" @if (@old('parking', $property->parking) == 'Yes') selected="selected" @endif>Yes</option>
+                            <option value="No" @if (@old('parking', $property->parking) == 'No') selected="selected" @endif>No</option>
+                            <option value="Plenty of street parking" @if (@old('parking', $property->parking) == 'Plenty of street parking') selected="selected" @endif>Plenty of street parking</option>
+                        </select>
+                        @if ($errors->has('parking'))
+                            <span class="text-danger">{{ $errors->first('parking') }}</span>
+                        @endif
+                    </div>
+                    <div class="form-group required form-control-wrap {{ $errors->has('storage') ? 'has-error' : '' }}">
+                        <label for="field_id_25">Storage</label>
+                        <select id="field_id_25" class="form-control" name="storage">
+                            <option value="">Storage</option>
+                            <option value="Yes, storage locker" @if (@old('storage', $property->storage) == 'Yes, storage locker') selected="selected" @endif>Yes, storage locker</option>
+                            <option value="No" @if (@old('storage', $property->storage) == 'No') selected="selected" @endif>No</option>
+                            <option value="In property storage" @if (@old('storage', $property->storage) == 'In property storage') selected="selected" @endif>In property storage</option>
+                        </select>
+                        @if ($errors->has('storage'))
+                            <span class="text-danger">{{ $errors->first('storage') }}</span>
+                        @endif
+                    </div>
+                    <h4>Included Utilities</h4>
+
+                    <div class="utility_item">
+                        <div class="form-check  md-form-inline-check">
+                            <input class="form-check-input filled-in" name="utilities[parking]" value="1" id="utilities_1" type="checkbox" @if (old('utilities.parking', @$utilities['parking']) == '1') checked @endif>
+                            <label class="form-check-label" for="utilities_1"> Parking x </label>
+                        </div>
+                        <div id="parking_details_box" style="margin-bottom:10px">
+                            <div class="md-form md-form-inline">
+                                <label for="utilities_2"># of parkings</label>
+                                <input type="text" id="utilities_2" name="utilities[num_parking]" value="{{ old('utilities.num_parking', $utilities['num_parking'] ?? '') }}" class="form-control" placeholder=''>
+                            </div>
+
+                            <div class="md-form md-form-inline">
+                                <label for="utilities_3">Stall #</label>
+                                <input type="text" id="utilities_3" name="utilities[stall]" value="{{ old('utilities.stall', $utilities['stall'] ?? '') }}" class="form-control" placeholder=''>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="utility_item">
+                        <div class="form-check  md-form-inline-check">
+                            <input class="form-check-input filled-in" name="utilities[storage]" value="1" id="utilities_4" type="checkbox" @if (old('utilities.storage', @$utilities['storage']) == '1') checked @endif>
+                            <label class="form-check-label" for="utilities_4"> Storage </label>
+                        </div>
+                        <div id="storage_details_box" style="margin-bottom:10px">
+                            <div class="md-form md-form-inline">
+                                <input type="text" id="utilities_5" name="utilities[storage_desc]" value="{{ old('utilities.storage_desc', $utilities['storage_desc'] ?? '') }}" class="form-control" placeholder=''>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="utility_item">
+                        <div class="form-check  md-form-inline-check">
+                            <input class="form-check-input filled-in" name="utilities[hot_water]" value="1" id="utilities_6" type="checkbox" @if (old('utilities.hot_water', @$utilities['hot_water']) == '1') checked @endif>
+                            <label class="form-check-label" for="utilities_6"> Hot Water </label>
+                        </div>
+                    </div>
+                    <div class="utility_item">
+                        <div class="form-check  md-form-inline-check">
+                            <input class="form-check-input filled-in" name="utilities[gas]" value="1" id="utilities_7" type="checkbox" @if (old('utilities.gas', @$utilities['gas']) == '1') checked @endif>
+                            <label class="form-check-label" for="utilities_7"> Gas </label>
+                        </div>
+                    </div>
+                    <div class="utility_item">
+                        <div class="form-check  md-form-inline-check">
+                            <input class="form-check-input filled-in" name="utilities[cable_tv]" value="1" id="utilities_8" type="checkbox" @if (old('utilities.cable_tv', @$utilities['cable_tv']) == '1') checked @endif>
+                            <label class="form-check-label" for="utilities_8"> Cable TV </label>
+                        </div>
+                    </div>
+                    <div class="utility_item">
+                        <div class="form-check  md-form-inline-check">
+                            <input class="form-check-input filled-in" name="utilities[internet]" value="1" id="utilities_9" type="checkbox" @if (old('utilities.internet', @$utilities['internet']) == '1') checked @endif>
+                            <label class="form-check-label" for="utilities_9"> Internet </label>
+                        </div>
+                    </div>
+                    <div class="utility_item">
+                        <div class="form-check  md-form-inline-check">
+                            <input class="form-check-input filled-in" name="utilities[electricity]" value="1" id="utilities_10" type="checkbox" @if (old('utilities.electricity', @$utilities['electricity']) == '1') checked @endif>
+                            <label class="form-check-label" for="utilities_10"> Electricity </label>
+                        </div>
+                    </div>
+                    <div class="utility_item">
+                        <div class="form-check  md-form-inline-check">
+                            <input class="form-check-input filled-in" name="utilities[others]" value="1" id="utilities_11" type="checkbox" @if (old('utilities.others', @$utilities['others']) == '1') checked @endif>
+                            <label class="form-check-label" for="utilities_11"> Others </label>
+                        </div>
+                        <div class="md-form md-form-inline" id="other_utilities_box">
+                            <label for="other_utilities">Other included utilities</label>
+                            <input type="text" id="utilities_12" name="utilities[others_desc]" value="{{ old('utilities.others_desc', $utilities['others_desc'] ?? '') }}" class="form-control" placeholder=''>
+                        </div>
+                    </div>
+
+                    <hr />
+                    <div class="utility_item">
+                        <div class="form-check  md-form-inline-check">
+                            <input class="form-check-input filled-in" name="utilities[no_utilities_included]" value="1" id="utilities_13" type="checkbox" @if (old('utilities.no_utilities_included', @$utilities['no_utilities_included']) == '1') checked @endif>
+                            <label class="form-check-label" for="utilities_13"> No utilities included </label>
+                        </div>
+                    </div>
+                    <hr />
+
+                    <div class="form-group required form-control-wrap {{ $errors->has('pet_policy') ? 'has-error' : '' }}">
+                        <label for="pet_policy">Pet Policy</label>
+                        <select id="pet_policy" class="form-control" name="pet_policy">
+                            <option value="">Pet Policy</option>
+                            <option value="Cats allowed" @if (@old('pet_policy', $property->pet_policy) == 'Cats allowed') selected="selected" @endif>Cats allowed</option>
+                            <option value="Dogs allowed" @if (@old('pet_policy', $property->pet_policy) == 'Dogs allowed') selected="selected" @endif>Dogs allowed</option>
+                            <option value="Cats/dogs allowed" @if (@old('pet_policy', $property->pet_policy) == 'Cats/dogs allowed') selected="selected" @endif>Cats/dogs allowed</option>
+                            <option value="No pets" @if (@old('pet_policy', $property->pet_policy) == 'No pets') selected="selected" @endif>No pets</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="area">In suite laundry</label>
+                        <input class="form-control" name="in_suite_laudry" id="in_suite_laudry" placeholder="In suite laundry" value="{{ old('in_suite_laudry', @$property['in_suite_laudry']) }}" type="text">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="area">Last rate change</label>
+                        <input class="form-control datepicker" name="last_rate_change" id="last_rate_change" placeholder="Last rate change" value="{{ old('last_rate_change', @$property['last_rate_change']) }}" type="text">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="area">Craigslist</label>
+                        <input class="form-control" name="craigslist" id="craigslist" placeholder="Craigslist" value="{{ old('craigslist', @$property['craigslist']) }}" type="text">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="area">Rentboard</label>
+                        <input class="form-control" name="rentboard" id="rentboard" placeholder="Rentboard" value="{{ old('rentboard', @$property['rentboard']) }}" type="text">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="area">FB</label>
+                        <input class="form-control" name="fb" id="fb" placeholder="FB" value="{{ old('fb', @$property['fb']) }}" type="text">
+                    </div>
+
+                    @if (auth()->user()->hasAnyRole('Administrator'))
+                        <div class="form-group">
+                            <label for="name">Assigned Agent/s</label>
+                            <select class="form-control select_agents select2" name="prop_agents[]" multiple="multiple">
+                                @if (isset($agents))
+                                    @foreach ($agents as $agent)
+                                        <option value="{{ $agent->id }}" @if (empty($property->prop_agents)) {{ $agent->id == auth()->user()->id ? 'selected' : '' }}  @else {{ collect(@old('prop_agents', explode(',', $property->prop_agents)))->contains($agent->id) ? 'selected' : '' }} @endif>{{ $agent->name }} </option>
+                                    @endforeach
+                                @endif
+                            </select>
+                        </div>
+                    @elseif(auth()->user()->hasAnyRole('Agent'))
+                        <input type="hidden" name="prop_agents[]" value="{{ auth()->user()->id }}">
+                    @else
+                        <div class="form-group">
+                            <label>Property Agent</label>
+                            <ul style="padding: 0;">
+                                @foreach (explode(',', $property->prop_agents) as $agent_a)
+                                    @if ($agent_a)
+                                        <li class="btn btn-default">{{ getUserById($agent_a)->name }}</li>
+                                    @endif
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    @if (auth()->user()->hasAnyRole('Administrator', 'Agent'))
+                        <div class="form-group required form-control-wrap {{ $errors->has('user_id') ? 'has-error' : '' }}">
+                            <label for="user_id">Property Owner</label>
+                            <select id="user_id" class="form-control select2" name="user_id" @if (
+                                !empty($property->user_id) &&
+                                    !auth()->user()->hasAnyRole('Administrator')) disabled @endif>
+                                <option value="">Select User</option>
+                                @if (isset($users))
+                                    @foreach ($users as $user)
+                                        <option value="{{ $user->id }}" @if (@old('user_id', $property->user_id) == $user->id) selected="selected" @endif>{{ $user->name }} [{{ $user->email }}]</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                        </div>
+                    @else
+                        <input type="hidden" name="user_id" value="{{ auth()->user()->id }}">
+                    @endif
+
+                    <div class="form-group{{ $errors->has('occupancy_status') ? ' has-error' : '' }}">
+                        <h5>Current Occupancy Status</h5>
+                        <div class="radio">
+                            <label><input name="occupancy_status" value="vacant" {{ @$property['occupancy_status'] == 'vacant' ? 'checked' : '' }} type="radio"> Vacant</label>
+                        </div>
+                        <div class="radio">
+                            <label><input name="occupancy_status" value="owner_occupied" {{ @$property['occupancy_status'] == 'owner_occupied' ? 'checked' : '' }} type="radio"> Owner Occupied</label>
+                        </div>
+                        <div class="radio">
+                            <label><input name="occupancy_status" value="tenant" {{ @$property['occupancy_status'] == 'tenant' ? 'checked' : '' }} type="radio"> Tenant</label>
+                        </div>
+                    </div>
+
+                    <div id="OccupancyTenantInfo" style="display: none;">
+                        <div class="form-group">
+                            <label for="beds">Tenant Name</label>
+                            <input class="form-control" name="occupancy_tenant_info[tenant_name]" id="tenant_name" value="{{ old('occupancy_tenant_info.tenant_name', @$occupancy_tenant_info['tenant_name']) }}" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="beds">Tenant Email</label>
+                            <input class="form-control" name="occupancy_tenant_info[tenant_email]" id="tenant_email" value="{{ old('occupancy_tenant_info.tenant_email', @$occupancy_tenant_info['tenant_email']) }}" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="beds">Tenant Phone</label>
+                            <input class="form-control" name="occupancy_tenant_info[tenant_phone]" id="tenant_phone" value="{{ old('occupancy_tenant_info.tenant_phone', @$occupancy_tenant_info['tenant_phone']) }}" type="text">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <h5>Featured Image</h5>
+                        <img id="featured_img" style="max-width: 100%;border: 1px solid #bbb;padding: 5px;margin-bottom: 20px;" src="@if (isset($property->featured_image['url'])) {{ url('storage/photos') }}/{{ $property->user_id }}/thumbs/{{ @$property->featured_image['url'] }}@else{{ asset('images/bolld-placeholder.png') }} @endif">
+                    </div>
+
+                    @if (auth()->user()->hasAnyRole('Administrator', 'Agent'))
+                        <hr>
+                        <h6 class="mb-1">Status</h6>
+                        <label class="c-switch c-switch-label c-switch-primary">
+                            <input class="c-switch-input" type="checkbox" {{ old('status', @$property->status) == 1 ? 'checked' : '' }} value="1" name="status" is="status">
+                            <span class="c-switch-slider" data-checked="On" data-unchecked="Off"></span>
+                        </label>
+                    @else
+                        <input type="hidden" name="status" value="{{ @$property->status ? $property->status : 0 }}">
+                    @endif
+
+                </div>
+                <div class="card-footer">
+                    <button type="submit" class="btn-lg btn-primary btn-block" id="submit_property_btn">{{ $property->id ? 'Update' : 'Submit' }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </form>
+@endsection
+@push('after-scripts')
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAP_KEY') }}&libraries=places&callback=initAutocomplete"></script>
+    <script>
+        var selDivStrata = selDivPhotos = "";
+        var storedFiles = [];
+        var storedPhotos = [];
+        $('input, textarea, select').on('keyup keydown change blur', function(e) {
+            $('input[type="submit"]').removeAttr('disabled');
+            $('button[type="submit"]').removeAttr('disabled');
+        });
+
+        jQuery(document).ready(function() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            $("#title").keyup(function() {
+                var Text = $(this).val();
+                // $.ajax({
+                //     url: "{{ '' }}",
+                //     type: "POST",
+                //     data: $('#skillbank_update').serialize(),
+                //     success: function(response) {
+                //         Swal.fire('Updated!', response.flash_success, 'success');
+                //     }
+                // });
+            });
+
+
+
+            $("#Stratafiles").on("change", handleFileSelectStrata);
+            selDivStrata = $("#selectedStrata");
+            $("#PropertyPhotos").on("change", handleFileSelect);
+            selDivPhotos = $("#selectedPhotos");
+            $("form#submit_property_form").on("submit", handleForm);
+            $("body").on("click", ".selFile", removeFile);
+        });
+
+        function handleFileSelect(e) {
+            var files = e.target.files;
+            var filesArr = Array.prototype.slice.call(files);
+            filesArr.forEach(function(f) {
+                if (!f.type.match("image.*")) {
+                    return;
+                }
+                storedPhotos.push(f);
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var html = "<span class=\"pip\">" + "<img class=\"imageThumb\" src=\"" + e.target.result + "\" title=\"" + f.name + "\"/>" + "<span class=\"selFile\" data-file='" + f.name + "' title='Click to remove'><i class=\"fa fa-trash\"></i></span>" + "</span>";
+                    selDivPhotos.append(html);
+                }
+                reader.readAsDataURL(f);
+            });
+        }
+
+        function handleFileSelectStrata(e) {
+            var files = e.target.files;
+            var filesArr = Array.prototype.slice.call(files);
+            filesArr.forEach(function(f) {
+                if (!f.type.match("image.*")) {
+                    //return;
+                }
+                storedFiles.push(f);
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    if (f.type == 'application/pdf') {
+                        var html = "<span class=\"pip\">" + "<img class=\"imageThumb\" src='{{ asset('images/pdf-icon.png') }}' title=\"" + f.name + "\"/>" + "<span class=\"selFile\" data-file='" + f.name + "' title='Click to remove'><i class=\"fa fa-trash\"></i></span>" + "</span>";
+                    } else {
+                        var html = "<span class=\"pip\">" + "<img class=\"imageThumb\" src=\"" + e.target.result + "\" title=\"" + f.name + "\"/>" + "<span class=\"selFile\" data-file='" + f.name + "' title='Click to remove'><i class=\"fa fa-trash\"></i></span>" + "</span>";
+                    }
+                    selDivStrata.append(html);
+                }
+                reader.readAsDataURL(f);
+            });
+        }
+
+
+        function handleForm(e) {
+            e.preventDefault();
+            $(".form-signin .box-footer :submit").attr("disabled", true);
+            var data = new FormData($(this)[0]);
+            for (var i = 0, len = storedFiles.length; i < len; i++) {
+                data.append('stratafiles[' + [i] + ']', storedFiles[i]);
+            }
+            for (var i = 0, len = storedPhotos.length; i < len; i++) {
+                data.append('propertyphotos[' + [i] + ']', storedPhotos[i]);
+            }
+            data.append('_token', $('input[name=_token]').val());
+            $.ajax({
+                method: "POST",
+                url: "{{ route('admin.properties.store') }}",
+                data: data,
+                dataType: 'json',
+                success: function(data) {
+                    //alert(data.status + 'HHHHHHHH');
+                    if (data.status == 'created' && data.url != '') {
+                        window.location.replace(data.url);
+                        $('#prop_update_msg').show();
+                        //$('#pmaForm').hide();
+                        $(window).scrollTop(0);
+                    }
+                },
+                error: function(data) {
+
+                    //alert(JSON.stringify(errors.errors));
+                    $('.alert-danger').html('');
+                    if (data.status === 422) {
+                        var errors = JSON.parse(data.responseText);
+                        $.each(errors.errors, function(key, value) {
+                            $('.alert-danger').show();
+                            $('.alert-danger').append('<p>' + value + '</p>');
+                        });
+                    } else {
+                        // Error
+                        // Incorrect credentials
+                        // alert('Incorrect credentials. Please try again.')
+                    }
+                    $(".form-signin .box-footer :submit").attr("disabled", false);
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        }
+
+        function removeFile(e) {
+            var file = $(this).data("file");
+            for (var i = 0; i < storedFiles.length; i++) {
+                if (storedFiles[i].name === file) {
+                    storedFiles.splice(i, 1);
+                    break;
+                }
+            }
+            $(this).parent().remove();
+        }
+
+        window.onload = function() {
+            var map;
+
+            function initialize() {
+                var myLatlng = new google.maps.LatLng({{ @$lat_long }});
+                var myOptions = {
+                    zoom: <?php echo $zoom; ?>,
+                    center: myLatlng,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                };
+                map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+                var geocoder = new google.maps.Geocoder();
+                var marker = new google.maps.Marker({
+                    draggable: true,
+                    position: myLatlng,
+                    map: map,
+                    title: "Property location"
+                });
+                google.maps.event.addListener(marker, 'dragend', function(event) {
+                    document.getElementById("lat").value = event.latLng.lat();
+                    document.getElementById("long").value = event.latLng.lng();
+                    geocoder.geocode({
+                        'latLng': event.latLng
+                    }, function(results, status) {
+                        if (status == google.maps.GeocoderStatus.OK) {
+                            /*if (results[0]) {
+                                document.getElementById("title").value = results[0].formatted_address;
+                                document.getElementById("slug").value = convertToSlug(results[0].formatted_address);
+                            }*/
+                            city = country = postal_code = neighborhood = st_address = street_number = '';
+                            results.forEach(function(element) {
+                                element.address_components.forEach(function(element2) {
+                                    element2.types.forEach(function(element3) {
+                                        switch (element3) {
+                                            case 'postal_code':
+                                                postal_code = element2.short_name;
+                                                break;
+                                            case 'administrative_area_level_1':
+                                                state = element2.long_name;
+                                                break;
+                                            case 'locality':
+                                                city = element2.long_name;
+                                                break;
+                                            case 'country':
+                                                country = element2.long_name;
+                                                break;
+                                            case 'neighborhood':
+                                                neighborhood = element2.long_name;
+                                                break;
+                                            case 'route':
+                                                st_address = element2.long_name;
+                                                break;
+                                            case 'street_number':
+                                                street_number = element2.long_name;
+                                                break;
+                                        }
+                                    })
+                                });
+                            });
+                            document.getElementById("address").value = street_number + ' ' + st_address;
+                            document.getElementById("neighborhood").value = neighborhood;
+                            document.getElementById("city").value = city;
+                            document.getElementById("state").value = state;
+                            document.getElementById("country").value = country;
+                            document.getElementById("zip").value = postal_code;
+                        }
+                    });
+                    //infoWindow.open(map, marker);
+                });
+            }
+            google.maps.event.addDomListener(window, "load", initialize());
+        }
+
+        var placeSearch, autocomplete;
+
+        function initAutocomplete() {
+            autocomplete = new google.maps.places.Autocomplete(
+                document.getElementById('autocomplete'), {
+                    types: ['geocode']
+                });
+            autocomplete.setComponentRestrictions({
+                'country': ['ca']
+            });
+            autocomplete.addListener('place_changed', fillInAddress);
+        }
+
+        function fillInAddress() {
+            var place = autocomplete.getPlace();
+            city = country = postal_code = neighborhood = st_address = street_number = '';
+            //document.getElementById("title").value = place.formatted_address;
+            //document.getElementById("slug").value = convertToSlug(place.formatted_address);
+            document.getElementById("lat").value = place.geometry.location.lat();
+            document.getElementById("long").value = place.geometry.location.lng();
+            place.address_components.forEach(function(element2) {
+                element2.types.forEach(function(element3) {
+                    switch (element3) {
+                        case 'postal_code':
+                            postal_code = element2.short_name;
+                            break;
+                        case 'administrative_area_level_1':
+                            state = element2.long_name;
+                            break;
+                        case 'locality':
+                            city = element2.long_name;
+                            break;
+                        case 'country':
+                            country = element2.long_name;
+                            break;
+                        case 'neighborhood':
+                            neighborhood = element2.long_name;
+                            break;
+                        case 'route':
+                            st_address = element2.long_name;
+                            break;
+                        case 'street_number':
+                            street_number = element2.long_name;
+                            break;
+                    }
+                })
+            });
+            document.getElementById("address").value = street_number + ' ' + st_address;
+            document.getElementById("neighborhood").value = neighborhood;
+            document.getElementById("city").value = city;
+            document.getElementById("state").value = state;
+            document.getElementById("country").value = country;
+            document.getElementById("zip").value = postal_code;
+        }
+
+        function geolocate() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var geolocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    var circle = new google.maps.Circle({
+                        center: geolocation,
+                        radius: position.coords.accuracy
+                    });
+                    //autocomplete.setBounds(circle.getBounds());
+                });
+            }
+        }
+    </script>
+@endpush

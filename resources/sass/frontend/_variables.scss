@@ -1,0 +1,40 @@
+// Body
+$body-bg: #ffffff;
+
+// Typography
+$font-family-sans-serif: 'Poppins', sans-serif;
+$font-size-base: 0.9rem;
+$line-height-base: 1.6;
+
+// Colors
+$blue: #0d99ff;
+$indigo: #6574cd;
+$purple: #9561e2;
+$pink: #f66d9b;
+$red: #EF4B4B;
+$orange: #f6993f;
+$yellow: #FDD501;
+$green: #38c172;
+$teal: #4dc0b5;
+$cyan: #6cb2eb;
+$dark: #000000;
+$white: #ffffff;
+$light: #F2F4F7;
+$secondary: #6c757d;
+$grey: #989898;
+$navbar-dark-color: rgba($white, .8);
+$navbar-dark-hover-color: rgba($white, 1);
+// $border-radius: 0rem !default;
+// $border-radius-lg: 0rem !default;
+// $border-radius-sm: 0rem !default;
+$card-cap-padding-y: 0.75rem;
+$card-cap-bg: $yellow;
+$card-cap-color: $white;
+$card-border-color: $yellow;
+$accent-yellow: $yellow;
+$light-yellow: #FFFDF1;
+$secondary-rgb: 108, 117, 125;
+$input-height-border: 2px;
+$form-floating-height: calc(3rem + $input-height-border);
+$form-floating-padding-y: 0.65rem;
+$modal-lg: 680px;

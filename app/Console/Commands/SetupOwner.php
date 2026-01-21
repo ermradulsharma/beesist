@@ -1,0 +1,62 @@
+<?php
+
+namespace App\Console\Commands;
+
+use Illuminate\Console\Command;
+use Carbon\Carbon;
+use Modules\Cms\Entities\EmailTemplate;
+use Modules\Leads\Entities\PropertyManagementAgreementForm;
+
+class SetupOwner extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'owner:setupowner';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Owner setup notification';
+
+    /**
+     * Create a new command instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     */
+    public function handle()
+    {
+        $forms = PropertyManagementAgreementForm::with('user')->select('id', 'user_id', 'n_own', 'won2_email', 'fName_1', 'lName_2', 'phone_4', 'email_5', 'dob_8', 'address_10', 'status', 'created_at')->where('notify_status', '1')->whereBetween('created_at', [Carbon::now()->subMinutes(120), Carbon::now()->subMinutes(60)])->get();
+        $email_data = EmailTemplate::where('title', 'SETUP OWNER')->first();
+        if ($email_data->status == '1') {
+            $additional = PropertyManagementAgreementForm::select('id', 'user_id', 'n_own', 'won2_email', 'fName_1', 'lName_2', 'phone_4', 'email_5', 'dob_8', 'address_10', 'status', 'created_at')->whereIn('user_id', explode(',', $email_data->other_reciepients))->with('user')->get();
+            $forms = $forms->merge($additional);
+            foreach ($forms as $form) {
+                $content = str_replace("[FIRST_NAME]", 'Admin', $email_data->content);
+                $content = str_replace("[LAST_NAME]", $form->lName_2, $content);
+                $content = str_replace("[EMAIL]", $form->email_5, $content);
+                $content = str_replace("../..", url('/'), $content);
+
+                Mail::to(admin_email(env('ADMIN_EMAIL')))->send(new PmaNotification($form, $content, $email_data->subject));
+                Notification::updateOrCreate(['user_id' => $form->user_id, 'form_id' => $form->id, 'template' => $email_data->title], ['user_id' => $form->user_id, 'form_id' => $form->id, 'template' => $email_data->title, 'status' => '1']);
+
+                EmailTemplate::find($email_data->id)->update(['other_reciepients' => '']);
+                PropertyManagementAgreementForm::find($form->id)->update(['notify_status' => 2]);
+            }
+        }
+    }
+}

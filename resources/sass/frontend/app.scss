@@ -1,0 +1,12 @@
+@import "../global";
+@import "global";
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+@import '~owl.carousel';
+@import '~owl.carousel/src/scss/owl.theme.default';
+@import 'lightslider/dist/css/lightslider.min.css';

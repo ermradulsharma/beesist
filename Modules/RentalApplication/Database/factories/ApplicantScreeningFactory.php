@@ -1,0 +1,28 @@
+<?php
+
+namespace Modules\RentalApplication\Database\factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class ApplicantScreeningFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = \Modules\RentalApplication\Entities\ApplicantScreening::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            //
+        ];
+    }
+}
+

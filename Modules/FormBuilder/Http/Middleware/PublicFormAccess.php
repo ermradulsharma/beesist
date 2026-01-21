@@ -1,0 +1,30 @@
+<?php
+
+namespace Modules\FormBuilder\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Modules\FormBuilder\Entities\Form;
+
+class PublicFormAccess
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @return mixed
+     */
+    public function handle(Request $request, Closure $next)
+    {
+        $identifier = $request->route('identifier');
+        $form = Form::where('identifier', $identifier)->firstOrFail();
+        if ($form->isPrivate()) {
+            if (! auth()->check()) {
+                return redirect()
+                    ->route('login')
+                    ->with('error', "Form '{$form->name}' requires you to login before you can access it.");
+            }
+        }
+
+        return $next($request);
+    }
+}

@@ -1,0 +1,47 @@
+@php
+    $routeName = $logged_in_user->hasAllAccess() ? 'user' : 'agent';
+@endphp
+<div style="min-width: 250px;">
+    @if ($user->trashed() && $logged_in_user->hasAllAccess())
+        <x-utils.form-button :action="route(rolebased() . '.auth.user.restore', $user)" method="patch" button-class="btn btn-info btn-sm" icon="fas fa-sync-alt" name="confirm-item">@lang('Restore')</x-utils.form-button>
+        @if (config('boilerplate.access.user.permanently_delete'))
+            <x-utils.delete-button :href="route(rolebased() . '.auth.user.permanently-delete', $user)" :text="__('Permanently Delete')" />
+        @endif
+    @else
+        @if ($logged_in_user->hasAllAccess() || $logged_in_user->hasManagerAccess())
+            <x-utils.view-button :href="route(rolebased() . '.auth.' . $routeName . '.show', $user)" />
+            <x-utils.edit-button :href="route(rolebased() . '.auth.' . $routeName . '.edit', $user)" />
+        @endif
+        @if (!$user->isActive())
+            <x-utils.form-button :action="route(rolebased() . '.auth.' . $routeName . '.mark', [$user, 1])" method="patch" button-class="btn btn-primary btn-sm" icon="fas fa-sync-alt" name="confirm-item" permission="admin.access.user.reactivate">@lang('Reactivate')</x-utils.form-button>
+        @endif
+        @if (($user->id !== $logged_in_user->id && !$user->isMasterAdmin() && $logged_in_user->hasAllAccess()) || ($user->id !== $logged_in_user->id && !$user->isManager() && $logged_in_user->hasManagerAccess()))
+            <x-utils.delete-button :href="route(rolebased() . '.auth.' . $routeName . '.destroy', $user)" />
+        @endif
+        {{-- The logged in user is the master admin, and the row is the master admin. Only the master admin can do anything to themselves --}}
+        @if (($user->isMasterAdmin() && $logged_in_user->isMasterAdmin()) || ($user->isManager() && $logged_in_user->isManager()))
+            <div class="dropdown d-inline-block">
+                <a class="btn btn-sm btn-secondary dropdown-toggle" id="moreMenuLink" href="#" role="button" data-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false">@lang('More')</a>
+                <div class="dropdown-menu" aria-labelledby="moreMenuLink">
+                    <x-utils.link :href="route(rolebased() . '.auth.' . $routeName . '.change-password', $user)" class="dropdown-item" :text="__('Change Password')" :permission="['admin.access.user.change-password', 'user.access.user.change-password']" />
+                </div>
+            </div>
+        @elseif ((!$user->isMasterAdmin() && $user->isActive() && $user->id !== $logged_in_user->id && ($logged_in_user->can('admin.access.user.change-password') || $logged_in_user->can('admin.access.user.clear-session') || $logged_in_user->can('admin.access.user.impersonate') || $logged_in_user->can('admin.access.user.deactivate'))) || (!$user->isManager() && $user->isActive() && $user->id !== $logged_in_user->id && ($logged_in_user->can('user.access.user.change-password') || $logged_in_user->can('user.access.user.clear-session') || $logged_in_user->can('user.access.user.impersonate') || $logged_in_user->can('user.access.user.deactivate'))))
+            <div class="dropdown d-inline-block">
+                <a class="btn btn-sm btn-secondary dropdown-toggle" id="moreMenuLink" href="#" role="button" data-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false">@lang('More')</a>
+                <div class="dropdown-menu" aria-labelledby="moreMenuLink">
+                    <x-utils.link :href="route(rolebased() . '.auth.' . $routeName . '.change-password', $user)" class="dropdown-item" :text="__('Change Password')" :permission="['admin.access.user.change-password', 'user.access.user.change-password']" />
+                    @if (($user->id !== $logged_in_user->id && !$user->isMasterAdmin()) || $logged_in_user->hasRole('Property Manager'))
+                        <x-utils.form-button :action="route(rolebased() . '.auth.' . $routeName . '.clear-session', $user)" name="confirm-item" button-class="dropdown-item" :permission="['admin.access.user.clear-session', 'user.access.user.clear-session']">@lang('Clear Session') </x-utils.form-button>
+                        @canBeImpersonated($user)
+                        @if (!session('impersonated_by'))
+                            <x-utils.link :href="route('impersonate', $user->id)" class="dropdown-item" :text="__('Login As ' . $user->name)" :permission="['admin.access.user.impersonate', 'user.access.user.impersonate']" />
+                        @endif
+                        @endCanBeImpersonated
+                        <x-utils.form-button :action="route(rolebased() . '.auth.' . $routeName . '.mark', [$user, 0])" method="patch" name="confirm-item" button-class="dropdown-item" :permission="['admin.access.user.deactivate', 'user.access.user.deactivate']">@lang('Deactivate')</x-utils.form-button>
+                    @endif
+                </div>
+            </div>
+        @endif
+    @endif
+</div>
