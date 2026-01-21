@@ -8,7 +8,7 @@ use Modules\Cms\Entities\EmailTemplate;
 use Modules\Property\Entities\ShowingApplication;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ShowingNotification;
-use App\Notification;
+use App\Models\Notification;
 
 class ShowingFollowup extends Command
 {

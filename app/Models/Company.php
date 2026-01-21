@@ -42,13 +42,13 @@ class Company extends Model
         parent::boot();
 
         static::creating(function ($model) {
-            $model->slug = Str::slug($model->company);
+            $model->slug = Str::slug($model->name);
             $model->generateUniqueSlug();
         });
 
         static::updating(function ($model) {
-            if ($model->isDirty('company')) {
-                $model->slug = Str::slug($model->company);
+            if ($model->isDirty('name')) {
+                $model->slug = Str::slug($model->name);
                 $model->generateUniqueSlug();
             }
         });

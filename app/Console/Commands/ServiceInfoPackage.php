@@ -4,8 +4,8 @@ namespace App\Console\Commands;
 
 use Modules\Cms\Entities\EmailTemplate;
 use App\Mail\GetQuoteNotification;
-use App\Notification;
-use App\QuoteRequests;
+use App\Models\Notification;
+use App\Models\QuoteRequests;
 use App\Domains\Auth\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
