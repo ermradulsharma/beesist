@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="public/images/Beesist-Logo.png" alt="Beesist Logo" width="300">
+</p>
+
 # Beesist - Modular Property Management Platform
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md)
@@ -129,6 +133,7 @@ Powered by [spatie/laravel-permission](https://spatie.be/docs/laravel-permission
     ```
 
 6. **Start Development Server**
+
     ```bash
     npm run dev
     php artisan serve
