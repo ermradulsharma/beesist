@@ -37,7 +37,7 @@ Route::get('terms', [TermsController::class, 'index'])->name('terms')->breadcrum
 Route::get('privacy', [TermsController::class, 'privacy'])->name('privacy')->breadcrumbs(function (Trail $trail) {
     $trail->parent('frontend.index')->push(__('Privacy Policy'), route('frontend.privacy'));
 });
-Route::get('pricing', [SubscriptionController::class, 'index'])->name('subscription')->breadcrumbs(function (Trail $trail) {
+Route::get('pricing', [SubscriptionController::class, 'price'])->name('subscription')->breadcrumbs(function (Trail $trail) {
     $trail->parent('frontend.index')->push(__('Subscription'), route('frontend.subscription'));
 });
 Route::match(['GET', 'POST'], 'price', [SubscriptionController::class, 'price'])->name('price')->breadcrumbs(function (Trail $trail) {

@@ -4,6 +4,7 @@
             max-width: 1440px !important;
         }
     }
+
     @media (max-width: 1440px) {
         body .container.header {
             max-width: 1440px !important;
@@ -16,15 +17,15 @@
         <div class="row">
             <div class="col-md-2 col-2">
                 @if (config('boilerplate.locale.status') && count(config('boilerplate.locale.languages')) > 1)
-                    <div class="dropdown">
-                        <x-utils.link :text="__(getLocaleName(app()->getLocale()))" aria-expanded="false" aria-haspopup="true" class="btn dropdown-toggle p-1 border" data-bs-toggle="dropdown" id="navbarDropdownLanguageLink">
-                            <x-slot name="text">
-                                <img class="me-2 rounded-1" height="18px" src="{{ asset('images/' . app()->getLocale() . '-flag.jpg') }}" style="max-height: 20px" width="22px" />
-                                <span class="caret"></span>
-                            </x-slot>
-                        </x-utils.link>
-                        @include('includes.partials.lang')
-                    </div>
+                <div class="dropdown">
+                    <x-utils.link :text="__(getLocaleName(app()->getLocale()))" aria-expanded="false" aria-haspopup="true" class="btn dropdown-toggle p-1 border" data-bs-toggle="dropdown" id="navbarDropdownLanguageLink">
+                        <x-slot name="text">
+                            <img class="me-2 rounded-1" height="18px" src="{{ asset('images/' . app()->getLocale() . '-flag.jpg') }}" style="max-height: 20px" width="22px" />
+                            <span class="caret"></span>
+                        </x-slot>
+                    </x-utils.link>
+                    @include('includes.partials.lang')
+                </div>
                 @endif
             </div>
             <div class="col-md-7 col-10">
@@ -68,7 +69,7 @@
                     <x-utils.link :href="route('frontend.index')" :active="activeClass(Route::is('frontend.index'))" :text="__('Home')" class="nav-link" />
                 </li>
                 <li class="nav-item">
-                    <x-utils.link :href="route('frontend.price')" :active="activeClass(Route::is('frontend.price'))" :text="__('Pricing')" class="nav-link" />
+                    <x-utils.link :href="route('frontend.subscription')" :active="activeClass(Route::is('frontend.subscription'))" :text="__('Pricing')" class="nav-link" />
                 </li>
                 <li class="nav-item">
                     <x-utils.link :href="route('frontend.about')" :active="activeClass(Route::is('frontend.about'))" :text="__('About')" class="nav-link" />
@@ -114,44 +115,44 @@
                         <x-utils.link aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="navbarDropdown" role="button" v-pre>
                             <x-slot name="text">
                                 <img class="rounded-circle" src="{{ $logged_in_user->avatar }}" style="max-height: 20px" />
-                                {{ $logged_in_user->name }} <span class="caret"></span>
-                            </x-slot>
-                        </x-utils.link>
+                {{ $logged_in_user->name }} <span class="caret"></span>
+                </x-slot>
+                </x-utils.link>
 
-                        <div aria-labelledby="navbarDropdown" class="dropdown-menu dropdown-menu-right">
-                            @if ($logged_in_user->isAdmin())
-                                <x-utils.link :href="route('admin.dashboard')" :text="__('Administration')" class="dropdown-item" />
-                            @endif
+                <div aria-labelledby="navbarDropdown" class="dropdown-menu dropdown-menu-right">
+                    @if ($logged_in_user->isAdmin())
+                    <x-utils.link :href="route('admin.dashboard')" :text="__('Administration')" class="dropdown-item" />
+                    @endif
 
-                            @if ($logged_in_user->isUser())
-                                <x-utils.link :href="route('frontend.user.dashboard')" :active="activeClass(Route::is('frontend.user.dashboard'))" :text="__('Dashboard')" class="dropdown-item" />
-                            @endif
+                    @if ($logged_in_user->isUser())
+                    <x-utils.link :href="route('frontend.user.dashboard')" :active="activeClass(Route::is('frontend.user.dashboard'))" :text="__('Dashboard')" class="dropdown-item" />
+                    @endif
 
-                            <x-utils.link :href="route('frontend.user.account')" :active="activeClass(Route::is('frontend.user.account'))" :text="__('My Account')" class="dropdown-item" />
+                    <x-utils.link :href="route('frontend.user.account')" :active="activeClass(Route::is('frontend.user.account'))" :text="__('My Account')" class="dropdown-item" />
 
-                            <x-utils.link :text="__('Logout')" class="dropdown-item" onclick="event.preventDefault();document.getElementById('logout-form').submit();">
-                                <x-slot name="text">
-                                    @lang('Logout')
-                                    <x-forms.post :action="route('frontend.auth.logout')" class="d-none" id="logout-form" />
-                                </x-slot>
-                            </x-utils.link>
-                        </div>
-                    </li>
+                    <x-utils.link :text="__('Logout')" class="dropdown-item" onclick="event.preventDefault();document.getElementById('logout-form').submit();">
+                        <x-slot name="text">
+                            @lang('Logout')
+                            <x-forms.post :action="route('frontend.auth.logout')" class="d-none" id="logout-form" />
+                        </x-slot>
+                    </x-utils.link>
+                </div>
+                </li>
                 @endguest --}}
             </ul>
         </div>
         <!--navbar-collapse-->
 
         @if (config('boilerplate.locale.status') && count(config('boilerplate.locale.languages')) > 1)
-            <div class="dropdown mx-4 d-md-none d-sm-none d-xs-none d-lg-block">
-                <x-utils.link :text="__(getLocaleName(app()->getLocale()))" aria-expanded="false" aria-haspopup="true" class="btn dropdown-toggle p-1 border" data-bs-toggle="dropdown" id="navbarDropdownLanguageLink">
-                    <x-slot name="text">
-                        <img class="me-2 rounded-1" height="18px" src="{{ asset('images/' . app()->getLocale() . '-flag.jpg') }}" style="max-height: 20px" width="22px" />
-                        {{ __(getLocaleName(app()->getLocale())) }} <span class="caret"></span>
-                    </x-slot>
-                </x-utils.link>
-                @include('includes.partials.lang')
-            </div>
+        <div class="dropdown mx-4 d-md-none d-sm-none d-xs-none d-lg-block">
+            <x-utils.link :text="__(getLocaleName(app()->getLocale()))" aria-expanded="false" aria-haspopup="true" class="btn dropdown-toggle p-1 border" data-bs-toggle="dropdown" id="navbarDropdownLanguageLink">
+                <x-slot name="text">
+                    <img class="me-2 rounded-1" height="18px" src="{{ asset('images/' . app()->getLocale() . '-flag.jpg') }}" style="max-height: 20px" width="22px" />
+                    {{ __(getLocaleName(app()->getLocale())) }} <span class="caret"></span>
+                </x-slot>
+            </x-utils.link>
+            @include('includes.partials.lang')
+        </div>
         @endif
 
         <!--End Flag Drpdown -->
@@ -165,14 +166,14 @@
         <!--End Header Button-->
 
         @guest
-            <div class="theme_button d-md-none d-sm-none d-xs-none d-lg-block ms-4">
-                <a class="btn btn-dark rounded-pill px-4 py-1 border-0 text-uppercase" href="{{ route('frontend.auth.login') }}">Login</a>
-            </div>
+        <div class="theme_button d-md-none d-sm-none d-xs-none d-lg-block ms-4">
+            <a class="btn btn-dark rounded-pill px-4 py-1 border-0 text-uppercase" href="{{ route('frontend.auth.login') }}">Login</a>
+        </div>
         @else
-            <div class="theme_button d-md-none d-sm-none d-xs-none d-lg-block ms-4">
-                <a class="btn btn-dark rounded-pill px-4 py-1 border-0 text-uppercase" onclick="event.preventDefault();document.getElementById('logout-form').submit();">Log Out</a>
-                <x-forms.post :action="route('frontend.auth.logout')" id="logout-form" class="d-none" />
-            </div>
+        <div class="theme_button d-md-none d-sm-none d-xs-none d-lg-block ms-4">
+            <a class="btn btn-dark rounded-pill px-4 py-1 border-0 text-uppercase" onclick="event.preventDefault();document.getElementById('logout-form').submit();">Log Out</a>
+            <x-forms.post :action="route('frontend.auth.logout')" id="logout-form" class="d-none" />
+        </div>
         @endguest
 
 
@@ -181,5 +182,5 @@
 </nav>
 
 @if (config('boilerplate.frontend_breadcrumbs'))
-    @include('frontend.includes.partials.breadcrumbs')
+@include('frontend.includes.partials.breadcrumbs')
 @endif

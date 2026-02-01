@@ -1,4 +1,4 @@
-<x-livewire-tables::bs4.table.cell>
+<td>
     @if ($row->type === \App\Domains\Auth\Models\User::TYPE_ADMIN)
     {{ __('Administrator') }}
     @elseif ($row->type === \App\Domains\Auth\Models\User::TYPE_USER)
@@ -6,20 +6,20 @@
     @else
     N/A
     @endif
-</x-livewire-tables::bs4.table.cell>
+</td>
 
-<x-livewire-tables::bs4.table.cell>
+<td>
     {{ $row->name }}
-</x-livewire-tables::bs4.table.cell>
+</td>
 
-<x-livewire-tables::bs4.table.cell>
+<td>
     {!! $row->permissions_label !!}
-</x-livewire-tables::bs4.table.cell>
+</td>
 
-<x-livewire-tables::bs4.table.cell>
+<td>
     {{ $row->users_count }}
-</x-livewire-tables::bs4.table.cell>
+</td>
 
-<x-livewire-tables::bs4.table.cell>
+<td>
     @include('backend.auth.role.includes.actions', ['model' => $row])
-</x-livewire-tables::bs4.table.cell>
+</td>

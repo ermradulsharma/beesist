@@ -37,9 +37,9 @@
     </div>
     <div id="app">
         @auth
-            @if (Auth::user()->hasAnyRole('Administrator', 'Property Manager', 'Property Owner', 'Agent'))
-                @include('backend.includes.partials._navigation')
-            @endif
+        @if (Auth::user()->hasAnyRole('Administrator', 'Property Manager', 'Property Owner', 'Agent'))
+        @include('backend.includes.partials._navigation')
+        @endif
         @endauth
         @include('frontend.includes.nav')
         @include('includes.partials.messages')
@@ -91,29 +91,29 @@
             }
         }
     </script>
+    @if (Session::has('message'))
     <script>
-        @if (Session::has('message'))
-            var type = "{{ Session::get('alert-type', 'info') }}"
-            switch (type) {
-                case 'info':
-                    toastr.options.timeOut = 10000;
-                    toastr.info("{{ Session::get('message') }}");
-                    break;
-                case 'success':
-                    toastr.options.timeOut = 10000;
-                    toastr.success("{{ Session::get('message') }}");
-                    break;
-                case 'warning':
-                    toastr.options.timeOut = 10000;
-                    toastr.warning("{{ Session::get('message') }}");
-                    break;
-                case 'error':
-                    toastr.options.timeOut = 10000;
-                    toastr.error("{{ Session::get('message') }}");
-                    break;
-            }
-        @endif
+        var type = "{{ Session::get('alert-type', 'info') }}"
+        switch (type) {
+            case 'info':
+                toastr.options.timeOut = 10000;
+                toastr.info("{{ Session::get('message') }}");
+                break;
+            case 'success':
+                toastr.options.timeOut = 10000;
+                toastr.success("{{ Session::get('message') }}");
+                break;
+            case 'warning':
+                toastr.options.timeOut = 10000;
+                toastr.warning("{{ Session::get('message') }}");
+                break;
+            case 'error':
+                toastr.options.timeOut = 10000;
+                toastr.error("{{ Session::get('message') }}");
+                break;
+        }
     </script>
+    @endif
     @stack('after-scripts')
 </body>
 
