@@ -25,9 +25,9 @@ class ServiceSeeder extends Seeder
     {
 
         $this->disableForeignKeys();
-        $this->truncate(PackageService::class);
-        $this->truncate(Package::class);
-        $this->truncate(Service::class);
+        $this->truncate('package_services');
+        $this->truncate('packages');
+        $this->truncate('services');
         $packages = [
             ['title' => 'Bronze', 'description' => 'Our Bronze subscription tier offers essential features tailored to meet your needs without overwhelming you with unnecessary extras.', 'total_property_limit' => '10', 'amount' => '45.00', 'status' => '1'],
             ['title' => 'Silver', 'description' => 'Our Silver subscription tier offers essential features tailored to meet your needs without overwhelming you with unnecessary extras.', 'total_property_limit' => '20', 'amount' => '75.00', 'status' => '1'],
@@ -125,28 +125,34 @@ class ServiceSeeder extends Seeder
                     $features[] = ['name' => $serviceObj->title];
                 }
 
-                $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
-                $product = $stripe->products->create([
-                    'name' => $packageObj->title,
-                    'description' => $packageObj->description,
-                    'metadata' => [
-                        'property_limit' => (string)$packageObj->total_property_limit,
-                        'features' => json_encode($features),
-                    ],
-                ]);
+                if (env('STRIPE_SECRET')) {
+                    try {
+                        $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
+                        $product = $stripe->products->create([
+                            'name' => $packageObj->title,
+                            'description' => $packageObj->description,
+                            'metadata' => [
+                                'property_limit' => (string)$packageObj->total_property_limit,
+                                'features' => json_encode($features),
+                            ],
+                        ]);
 
-                $price = $stripe->prices->create([
-                    'product' => $product->id,
-                    'unit_amount' => $packageObj->amount * 100,
-                    'currency' => 'usd',
-                    'recurring' => [
-                        'interval' => 'month',
-                    ],
-                ]);
-                $packageObj->update([
-                    'stripe_product_id' => $product->id,
-                    'stripe_price_id' => $price->id,
-                ]);
+                        $price = $stripe->prices->create([
+                            'product' => $product->id,
+                            'unit_amount' => $packageObj->amount * 100,
+                            'currency' => 'usd',
+                            'recurring' => [
+                                'interval' => 'month',
+                            ],
+                        ]);
+                        $packageObj->update([
+                            'stripe_product_id' => $product->id,
+                            'stripe_price_id' => $price->id,
+                        ]);
+                    } catch (\Exception $e) {
+                        \Log::error("Stripe Seeding Error: " . $e->getMessage());
+                    }
+                }
             }
         }
         $this->enableForeignKeys();

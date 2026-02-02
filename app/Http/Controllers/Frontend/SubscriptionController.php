@@ -53,13 +53,18 @@ class SubscriptionController extends Controller
             } catch (IncompletePayment $exception) {
                 Log::alert($exception->payment->status);
                 if ($exception instanceof \Laravel\Cashier\Exceptions\IncompletePayment) {
-                    $subscriptionId = $exception->payment->invoice->subscription->id;
-                    UserEntity::updateOrCreate(
-                        ['account_id' => Auth::user()->id, 'entity_key' => 'subscription', 'entity_value' => $subscriptionId],
-                        ['account_id' => Auth::user()->id, 'entity_key' => 'subscription', 'entity_value' => $subscriptionId]
-                    );
+                    $stripeSubscriptionId = $exception->payment->invoice->subscription->id;
+                    $localSubscription = Subscription::where('stripe_id', $stripeSubscriptionId)->first();
+                    $localId = $localSubscription ? $localSubscription->id : null;
 
-                    return redirect()->route('cashier.payment', [$exception->payment->id, 'redirect' => route('frontend.user.payment.success', $subscriptionId)]);
+                    if ($localId) {
+                        UserEntity::updateOrCreate(
+                            ['account_id' => Auth::user()->id, 'entity_key' => 'subscription'],
+                            ['entity_value' => $localId]
+                        );
+                    }
+
+                    return redirect()->route('cashier.payment', [$exception->payment->id, 'redirect' => route('frontend.user.payment.success', $stripeSubscriptionId)]);
                 } else {
                     return back()->withInput()->withErrors(['error' => $exception->getMessage()]);
                 }
@@ -106,9 +111,9 @@ class SubscriptionController extends Controller
         $user = Auth::user();
         $customerId = $user->stripe_id;
         $stripe = new \Stripe\StripeClient([
-             'api_key' => config('cashier.secret'),
-             'stripe_version' => "2024-04-10",
-         ]);
+            'api_key' => config('cashier.secret'),
+            'stripe_version' => "2024-04-10",
+        ]);
 
         $subscriptions = $stripe->subscriptions->all([
             'customer' => $customerId,

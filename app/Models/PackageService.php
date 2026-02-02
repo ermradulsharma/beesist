@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class PackageService extends Model
 {
     use HasFactory;
+    public $incrementing = false;
     public $timestamps = false;
     protected $fillable = [
         'package_id',

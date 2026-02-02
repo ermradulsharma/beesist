@@ -84,7 +84,13 @@ class UserSeeder extends Seeder
                             'country' => $addresses[$key]['country'],
                         ],
                     ];
-                    $user->createAsStripeCustomer($customerDetails);
+                    if (env('STRIPE_SECRET')) {
+                        try {
+                            $user->createAsStripeCustomer($customerDetails);
+                        } catch (\Exception $e) {
+                            \Log::error("Stripe Customer Creation Error: " . $e->getMessage());
+                        }
+                    }
                     $user->assignRole($value['role']);
                 }
             }

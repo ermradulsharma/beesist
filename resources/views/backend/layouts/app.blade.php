@@ -95,47 +95,61 @@
             }
         }
     </script>
+    @if (isset($errors) && $errors->any())
     <script>
-        @if (isset($errors) && $errors->any())
-            toastr.options.timeOut = 10000;
-            toastr.error(`@foreach ($errors->all() as $error) {{ $error }}<br/> @endforeach`);
-        @endif
-
-        @if (session()->get('flash_success'))
-            toastr.options.timeOut = 10000;
-            toastr.success(`{{ session()->get('flash_success') }}`);
-        @endif
-
-        @if (session()->get('flash_warning'))
-            toastr.options.timeOut = 10000;
-            toastr.warning(`{{ session()->get('flash_warning') }}`);
-        @endif
-
-        @if (session()->get('flash_info') || session()->get('flash_message'))
-            toastr.options.timeOut = 10000;
-            toastr.info(`{{ session()->get('flash_info') }}`);
-        @endif
-
-        @if (session()->get('flash_danger'))
-            toastr.options.timeOut = 10000;
-            toastr.error(`{{ session()->get('flash_danger') }}`);
-        @endif
-
-        @if (session()->get('status'))
-            toastr.options.timeOut = 10000;
-            toastr.success(`{{ session()->get('status') }}`);
-        @endif
-
-        @if (session()->get('resent'))
-            toastr.options.timeOut = 10000;
-            toastr.success(`@lang('A fresh verification link has been sent to your email address.')`);
-        @endif
-
-        @if (session()->get('verified'))
-            toastr.options.timeOut = 10000;
-            toastr.success(`@lang('Thank you for verifying your e-mail address.')`);
-        @endif
+        toastr.options.timeOut = 10000;
+        toastr.error(`@foreach ($errors->all() as $error) {{ $error }}<br/> @endforeach`);
     </script>
+    @endif
+
+    @if (session()->get('flash_success'))
+    <script>
+        toastr.options.timeOut = 10000;
+        toastr.success(`{{ session()->get('flash_success') }}`);
+    </script>
+    @endif
+
+    @if (session()->get('flash_warning'))
+    <script>
+        toastr.options.timeOut = 10000;
+        toastr.warning(`{{ session()->get('flash_warning') }}`);
+    </script>
+    @endif
+
+    @if (session()->get('flash_info') || session()->get('flash_message'))
+    <script>
+        toastr.options.timeOut = 10000;
+        toastr.info(`{{ session()->get('flash_info') }}`);
+    </script>
+    @endif
+
+    @if (session()->get('flash_danger'))
+    <script>
+        toastr.options.timeOut = 10000;
+        toastr.error(`{{ session()->get('flash_danger') }}`);
+    </script>
+    @endif
+
+    @if (session()->get('status'))
+    <script>
+        toastr.options.timeOut = 10000;
+        toastr.success(`{{ session()->get('status') }}`);
+    </script>
+    @endif
+
+    @if (session()->get('resent'))
+    <script>
+        toastr.options.timeOut = 10000;
+        toastr.success(`@lang('A fresh verification link has been sent to your email address.')`);
+    </script>
+    @endif
+
+    @if (session()->get('verified'))
+    <script>
+        toastr.options.timeOut = 10000;
+        toastr.success(`@lang('Thank you for verifying your e-mail address.')`);
+    </script>
+    @endif
 
     @stack('after-scripts')
 </body>

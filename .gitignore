@@ -1,60 +1,94 @@
 # Beesist - .gitignore
 
-# --- Core Laravel ---
+# ----------------------------------------------------------------------
+# Core Laravel
+# ----------------------------------------------------------------------
 /vendor
 /node_modules
-/public/storage
 /public/hot
+/public/storage
+/public/build
 /public/mix-manifest.json
 /storage/*.key
-/storage/debugbar
 .env
-.env.backup
-.env.production
+.env.*
+!.env.example
 .phpunit.result.cache
-/coverage
-coverage.xml
 
-# --- Modules & Plugins ---
+# ----------------------------------------------------------------------
+# Modules & Plugins
+# ----------------------------------------------------------------------
 /Modules/*/assets
 modules_statuses.json
 
-# --- IDE Helper / Tooling ---
+# ----------------------------------------------------------------------
+# Storage & Generated Files
+# ----------------------------------------------------------------------
+/storage/app/public/
+/storage/framework/cache/data/
+/storage/framework/views
+/storage/framework/sessions
+/storage/framework/testing
+/storage/logs/*.log
+/storage/debugbar
+
+# ----------------------------------------------------------------------
+# IDE & Tooling
+# ----------------------------------------------------------------------
+.idea/
+.vscode/
+.fleet/
+.zed/
+*.sublime-project
+*.sublime-workspace
 .phpstorm.meta.php
 _ide_helper.php
 _ide_helper_models.php
 .php-cs-fixer.cache
 .php_cs.cache
-.vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
 
-# --- OS Specific ---
+# ----------------------------------------------------------------------
+# OS Specific
+# ----------------------------------------------------------------------
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
-# --- Build & Logs ---
+# ----------------------------------------------------------------------
+# Build, Logs & temporary
+# ----------------------------------------------------------------------
 npm-debug.log
 yarn-error.log
+error_log
 error.log
+*.log
+*.tmp
+/coverage
+coverage.xml
+
+# ----------------------------------------------------------------------
+# User Uploads
+# ----------------------------------------------------------------------
 /public/uploads/*
 !/public/uploads/.gitkeep
 
-# --- Docker & Sail ---
-# docker/
-# docker-compose.override.yml
-
-# --- Local Temporary Files ---
-output.txt
-routes.json
+# ----------------------------------------------------------------------
+# Environment & Local Configurations
+# ----------------------------------------------------------------------
 Homestead.json
 Homestead.yaml
+auth.json
+.fleet
+.env.backup
+output.txt
+routes.json
 
-# --- Miscellaneous ---
-*.zip
-/storage/app/public/
-/storage/framework/cache/data/
-/storage/framework/views/*.php
-/storage/framework/sessions/
-/storage/logs/*.log
+# ----------------------------------------------------------------------
+# Database / Backups
+# ----------------------------------------------------------------------
+*.sql
+*.sqlite
